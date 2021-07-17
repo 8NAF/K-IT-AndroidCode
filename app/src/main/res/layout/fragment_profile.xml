@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools">
+	
+	<data>
+		<import type="android.text.InputType" />
+		<variable
+			name="user"
+			type="com.google.firebase.auth.FirebaseUser"/>
+		<variable
+			name="viewModel"
+			type="com.group4.khoatritoan.k_it.ui.main.tab.profile.ProfileViewModel" />
+	</data>
+	
+	<androidx.constraintlayout.widget.ConstraintLayout
+		android:layout_height="match_parent"
+		android:layout_width="match_parent">
+		
+		<com.google.android.material.textfield.TextInputLayout
+			android:id="@+id/tilCurrentUsername"
+			android:focusable="true"
+			android:focusableInTouchMode="true"
+			android:layout_width="0dp"
+			android:layout_height="@dimen/height_text_input"
+			android:layout_marginHorizontal="@dimen/margin_horizontal_parent"
+			android:layout_marginTop="100dp"
+			style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+			app:hintTextAppearance="@style/Theme.TextLabel"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
+			
+			<com.google.android.material.textfield.TextInputEditText
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:hint="@string/label_username"
+				android:inputType="@{InputType.TYPE_NULL}"
+				android:text="@{user.email}"
+				android:textIsSelectable="true"
+				android:textSize="@dimen/text_size_text_input" />
+		</com.google.android.material.textfield.TextInputLayout>
+		<com.google.android.material.textfield.TextInputLayout
+			android:id="@+id/tilOldPassword"
+			android:layout_width="0dp"
+			android:layout_height="@dimen/height_text_input"
+			android:layout_marginTop="@dimen/margin_between_text_input"
+			app:hintTextAppearance="@style/Theme.TextLabel"
+			style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+			android:layout_marginHorizontal="@dimen/margin_horizontal_parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/tilCurrentUsername"
+			app:passwordToggleDrawable="@drawable/show_password"
+			app:passwordToggleEnabled="true">
+			
+			<com.google.android.material.textfield.TextInputEditText
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:hint="@string/label_old_password"
+				android:text="@={viewModel.oldPassword}"
+				android:inputType="textPassword"
+				android:textSize="@dimen/text_size_text_input" />
+		</com.google.android.material.textfield.TextInputLayout>
+		<com.google.android.material.textfield.TextInputLayout
+			android:id="@+id/tilNewPassword"
+			android:layout_width="0dp"
+			android:layout_height="@dimen/height_text_input"
+			android:layout_marginTop="@dimen/margin_between_text_input"
+			app:hintTextAppearance="@style/Theme.TextLabel"
+			style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+			android:layout_marginHorizontal="@dimen/margin_horizontal_parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/tilOldPassword"
+			app:passwordToggleDrawable="@drawable/show_password"
+			app:passwordToggleEnabled="true">
+			
+			<com.google.android.material.textfield.TextInputEditText
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:hint="@string/label_new_password"
+				android:inputType="textPassword"
+				android:text="@={viewModel.newPassword}"
+				android:textSize="@dimen/text_size_text_input" />
+		</com.google.android.material.textfield.TextInputLayout>
+		<com.google.android.material.textfield.TextInputLayout
+			android:id="@+id/tilConfirmedNewPassword"
+			android:layout_width="0dp"
+			android:layout_height="@dimen/height_text_input"
+			android:layout_marginTop="@dimen/margin_between_text_input"
+			app:hintTextAppearance="@style/Theme.TextLabel"
+			style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+			android:layout_marginHorizontal="@dimen/margin_horizontal_parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/tilNewPassword"
+			app:passwordToggleDrawable="@drawable/show_password"
+			app:passwordToggleEnabled="true">
+			
+			<com.google.android.material.textfield.TextInputEditText
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:hint="@string/label_confirmed_new_password"
+				android:inputType="textPassword"
+				android:text="@={viewModel.confirmedNewPassword}"
+				android:textSize="@dimen/text_size_text_input" />
+		</com.google.android.material.textfield.TextInputLayout>
+		
+		<Button
+			android:id="@+id/btnUpdatePassword"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/label_update_password"
+			android:textSize="@dimen/text_size_label"
+			android:padding="10dp"
+			android:enabled="@{viewModel.isEnabled}"
+			android:onClick="@{viewModel::onUpdatePassword}"
+			android:layout_marginTop="10dp"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toBottomOf="@+id/tilConfirmedNewPassword" />
+		
+		<com.google.android.material.floatingactionbutton.FloatingActionButton
+			android:id="@+id/fabSignOut"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:tooltipText="@string/label_sign_out"
+			android:clickable="true"
+			android:focusable="true"
+			android:onClick="@{viewModel::onSignOut}"
+			android:layout_marginBottom="80dp"
+			android:layout_marginEnd="@dimen/margin_horizontal_parent"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:srcCompat="@drawable/ic_logout_24" />
+	</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+

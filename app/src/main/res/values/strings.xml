@@ -1,0 +1,59 @@
+<resources>
+	<string name="app_name">K-IT</string>
+	
+	<string name="label_login">Đăng nhập</string>
+	<string name="label_username">Tên đăng nhập</string>
+	<string name="label_password">Mật khẩu</string>
+	<string name="label_profile">Thông tin chi tiết</string>
+	<string name="label_old_password">Nhập mật khẩu cũ</string>
+	<string name="label_new_password">Nhập mật khẩu mới</string>
+	<string name="label_confirmed_new_password">Xác nhận mật khẩu mới</string>
+	<string name="label_update_password">Cập nhật</string>
+	<string name="label_sign_out">Đăng xuất</string>
+	<string name="label_turn_on_notification">Nhận thông báo</string>
+	<string name="label_delay_notification_time">Thời gian chờ</string>
+	<string name="label_minute">Phút</string>
+	<string name="label_second">Giây</string>
+	<string name="label_select_date">Chọn ngày</string>
+	<string name="label_from">Từ</string>
+	<string name="label_to">Đến</string>
+	<string name="label_no_notification">Không có thông báo nào</string>
+	<string name="label_oldest">Cũ nhất</string>
+	<string name="label_newest">Mới nhất</string>
+	<string name="label_forgot_password">Quên mật khẩu ?</string>
+	<string name="label_email">Email</string>
+	<string name="label_send">Gửi</string>
+	
+	<string name="help_login">Sử dụng tài khoản mà chúng tôi\nđã cung cấp cho bạn</string>
+	
+	<string name="action_dismiss">Ẩn</string>
+	
+	<string name="error_network">Không thể kết nối với Internet.</string>
+	<string name="error_unknown">Có lỗi đã xảy ra.</string>
+	<string name="error_too_many_fail_auth">Bạn đã nhập sai quá nhiều lần, vui lòng thử lại sau.</string>
+	<string name="error_user_disabled">Tài khoản của bạn đã bị vô hiệu hóa.</string>
+	<string name="error_wrong_password">Mật khẩu không khớp với tài khoản này.</string>
+	<string name="error_not_provide_information">Vui lòng nhập đầy đủ tên tài khoản và mật khẩu.</string>
+	<string name="error_not_provide_email">Vui lòng nhập email.</string>
+	<string name="error_invalid_email">Định dạng email không hợp lệ</string>
+	<string name="error_user_not_found">Tài khoản không tồn tại hoặc đã bị xóa</string>
+	<string name="error_user_deleted">Tài khoản đã bị xóa</string>
+	<string name="error_not_provide_password">Vui lòng nhập đầy đủ các trường mật khẩu</string>
+	<string name="error_weak_password">Mật khẩu mới quá ngắn (dưới 6 ký tự)</string>
+	
+	<string name="success_update_password">Cập nhật mật khẩu thành công</string>
+	<string name="success_send_reset_password">Đã gửi yêu cầu đến email của bạn</string>
+	
+	<string name="title_home">Trang chủ</string>
+	<string name="title_logs">Nhật ký</string>
+	<string name="title_profile">Thông tin người dùng</string>
+	<string name="title_reset_password">Đặt lại mật khẩu</string>
+	<string name="label_auto_mode">Tự động bật tắt nhận thông báo</string>
+	<string name="label_auto_on">Tự động bật</string>
+	<string name="label_auto_off">Tự động tắt</string>
+	<string name="title_notification">Thông báo</string>
+	<string name="title_start_change_turn_on_notification">Bắt đầu thay đổi</string>
+	<string name="title_end_change_turn_on_notification">Kết thúc thay đổi</string>
+	<string name="label_turn_on">Bật nhận thông báo</string>
+	<string name="label_turn_off">Tắt nhận thông báo</string>
+</resources>

@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools">
+	
+	<data>
+		<import type="android.text.InputType" />
+		<variable
+			name="viewModel"
+			type="com.group4.khoatritoan.k_it.ui.main.tab.home.HomeViewModel" />
+	</data>
+	
+	<ScrollView
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		
+		<androidx.constraintlayout.widget.ConstraintLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			tools:context=".ui.main.tab.home.HomeFragment">
+			
+			<com.google.android.material.card.MaterialCardView
+				android:layout_marginTop="5dp"
+				android:layout_marginHorizontal="@dimen/margin_horizontal_parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintTop_toTopOf="parent"
+				app:cardCornerRadius="8dp"
+				app:cardElevation="2dp"
+				android:id="@+id/cv1"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+				
+				<androidx.appcompat.widget.SwitchCompat
+					android:id="@+id/swtTurnOnNotification"
+					android:layout_gravity="center"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginVertical="5dp"
+					android:checked="@={viewModel.isTurnOnNotification}"
+					android:text="@string/label_turn_on_notification"
+					android:textSize="@dimen/text_size_label"
+					android:thumb="@drawable/switch_thumb"
+					app:layout_constraintEnd_toEndOf="parent"
+					app:layout_constraintStart_toStartOf="parent"
+					app:layout_constraintTop_toTopOf="parent"
+					app:switchPadding="5dp"
+					app:track="@drawable/switch_track" />
+			
+			</com.google.android.material.card.MaterialCardView>
+			<com.google.android.material.card.MaterialCardView
+				android:id="@+id/cv2"
+				app:layout_constraintTop_toBottomOf="@+id/cv1"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintEnd_toEndOf="parent"
+				android:layout_marginTop="5dp"
+				app:cardCornerRadius="8dp"
+				app:cardElevation="2dp"
+				android:layout_marginHorizontal="@dimen/margin_horizontal_parent"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+				
+				<androidx.constraintlayout.widget.ConstraintLayout
+					android:layout_width="match_parent"
+					android:layout_margin="5dp"
+					android:layout_height="match_parent">
+					
+					<TextView
+						android:id="@+id/tvDelayNotification"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginStart="5dp"
+						android:text="@string/label_delay_notification_time"
+						android:textColor="@color/black"
+						android:textSize="@dimen/text_size_label"
+						app:layout_constraintBottom_toBottomOf="@+id/npMinute"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="@+id/npMinute" />
+					
+					<TextView
+						android:id="@+id/tvMinute"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginTop="5dp"
+						android:text="@string/label_minute"
+						app:layout_constraintEnd_toEndOf="@+id/npMinute"
+						app:layout_constraintStart_toStartOf="@+id/npMinute"
+						app:layout_constraintTop_toTopOf="parent" />
+					
+					<NumberPicker
+						android:id="@+id/npMinute"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginStart="20dp"
+						android:maxValue="@{viewModel.maxTime.first}"
+						android:minValue="@{viewModel.minTime.first}"
+						android:value="@={viewModel.currentMinute}"
+						app:layout_constraintStart_toEndOf="@+id/tvDelayNotification"
+						app:layout_constraintTop_toBottomOf="@+id/tvMinute" />
+					
+					<TextView
+						android:id="@+id/textView"
+						android:layout_width="5dp"
+						android:layout_height="wrap_content"
+						android:layout_marginStart="5dp"
+						android:textColor="@color/black"
+						android:text=":"
+						android:textSize="@dimen/text_size_text_input"
+						app:layout_constraintBottom_toBottomOf="@+id/npMinute"
+						app:layout_constraintStart_toEndOf="@+id/npMinute"
+						app:layout_constraintTop_toTopOf="@+id/npMinute" />
+					
+					<TextView
+						android:id="@+id/tvSecond"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/label_second"
+						android:layout_marginTop="5dp"
+						app:layout_constraintEnd_toEndOf="@+id/npSecond"
+						app:layout_constraintStart_toStartOf="@+id/npSecond"
+						app:layout_constraintTop_toTopOf="parent" />
+					
+					<NumberPicker
+						android:id="@+id/npSecond"
+						android:layout_width="64dp"
+						android:layout_height="wrap_content"
+						android:layout_marginStart="5dp"
+						android:maxValue="@{59}"
+						android:minValue="@{0}"
+						android:value="@={viewModel.currentSecond}"
+						app:layout_constraintStart_toEndOf="@+id/textView"
+						app:layout_constraintTop_toBottomOf="@+id/tvSecond" />
+					
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/fabDone1"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:backgroundTint="@color/teal_200"
+						android:visibility="gone"
+						app:elevation="0dp"
+						android:layout_marginBottom="5dp"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintEnd_toEndOf="@id/npMinute"
+						app:layout_constraintStart_toStartOf="@id/npMinute"
+						app:layout_constraintTop_toBottomOf="@id/npMinute"
+						app:srcCompat="@drawable/ic_done_24"
+						tools:visibility="visible" />
+					
+					
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/fabCancel1"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:backgroundTint="@color/red"
+						android:visibility="gone"
+						app:elevation="0dp"
+						app:layout_constraintBottom_toBottomOf="parent"
+						android:layout_marginBottom="5dp"
+						app:layout_constraintEnd_toEndOf="@id/npSecond"
+						app:layout_constraintStart_toStartOf="@id/npSecond"
+						app:layout_constraintTop_toBottomOf="@id/npSecond"
+						app:srcCompat="@drawable/ic_cancel_24"
+						tools:layout_editor_absoluteX="248dp"
+						tools:visibility="visible" />
+				
+				</androidx.constraintlayout.widget.ConstraintLayout>
+			
+			</com.google.android.material.card.MaterialCardView>
+			
+			<com.google.android.material.card.MaterialCardView
+				android:id="@+id/cv3"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_marginHorizontal="@dimen/margin_horizontal_parent"
+				android:layout_marginVertical="5dp"
+				app:cardCornerRadius="8dp"
+				app:cardElevation="2dp"
+				app:layout_constraintBottom_toBottomOf="parent"
+				app:layout_constraintEnd_toEndOf="parent"
+				app:layout_constraintStart_toStartOf="parent"
+				app:layout_constraintTop_toBottomOf="@id/cv2">
+				
+				<androidx.constraintlayout.widget.ConstraintLayout
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:layout_margin="5dp">
+					
+					<androidx.appcompat.widget.SwitchCompat
+						android:id="@+id/swtAutoMode"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_gravity="center"
+						android:checked="@={viewModel.autoModeIsEnabled}"
+						android:text="@string/label_auto_mode"
+						android:textSize="@dimen/text_size_label"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="parent"
+						app:switchPadding="5dp" />
+					
+					<com.google.android.material.button.MaterialButtonToggleGroup
+						android:id="@+id/tgAutoMode"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginHorizontal="@dimen/margin_horizontal_parent"
+						app:checkedButton="@id/btnTurnOnMode"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toBottomOf="@id/swtAutoMode"
+						app:selectionRequired="true"
+						app:singleSelection="true">
+						
+						<Button
+							android:enabled="@{viewModel.autoModeIsEnabled}"
+							android:id="@+id/btnTurnOnMode"
+							style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="@string/label_auto_on"
+							android:textColor="@color/safe" />
+						
+						<Button
+							android:enabled="@{viewModel.autoModeIsEnabled}"
+							android:id="@+id/btnTurnOffMode"
+							style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:text="@string/label_auto_off"
+							android:textColor="@color/danger" />
+					
+					</com.google.android.material.button.MaterialButtonToggleGroup>
+					
+					<com.google.android.material.textfield.TextInputLayout
+						android:id="@+id/tilStartTime"
+						style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_marginStart="5dp"
+						android:layout_marginTop="5dp"
+						android:enabled="false"
+						app:layout_constraintEnd_toStartOf="@+id/btnStartTime"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toBottomOf="@+id/tgAutoMode">
+						
+						<com.google.android.material.textfield.TextInputEditText
+							android:id="@+id/tietStartTime"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:hint="@string/label_from"
+							android:inputType="@{InputType.TYPE_NULL}"
+							android:textColor="@color/black"
+							android:timeWithoutSecond="@{viewModel.startTime}" />
+					</com.google.android.material.textfield.TextInputLayout>
+					
+					<ImageButton
+						android:clickable="@{viewModel.autoModeIsEnabled}"
+						android:id="@+id/btnStartTime"
+						android:layout_width="wrap_content"
+						android:layout_height="0dp"
+						android:layout_marginEnd="5dp"
+						android:background="@android:color/transparent"
+						app:layout_constraintBottom_toBottomOf="@+id/tilStartTime"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintTop_toTopOf="@id/tilStartTime"
+						app:srcCompat="@drawable/ic_timer_48" />
+					
+					<com.google.android.material.textfield.TextInputLayout
+						android:id="@+id/tilEndTime"
+						style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+						android:layout_width="0dp"
+						android:layout_height="wrap_content"
+						android:layout_marginStart="5dp"
+						android:layout_marginTop="@dimen/margin_between_text_input"
+						android:enabled="false"
+						app:layout_constraintEnd_toStartOf="@id/btnStartTime"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toBottomOf="@id/tilStartTime">
+						
+						<com.google.android.material.textfield.TextInputEditText
+							android:id="@+id/tietEndTime"
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:hint="@string/label_to"
+							android:inputType="@{InputType.TYPE_NULL}"
+							android:textColor="@color/black"
+							android:timeWithoutSecond="@{viewModel.endTime}" />
+					</com.google.android.material.textfield.TextInputLayout>
+					
+					<ImageButton
+						android:clickable="@{viewModel.autoModeIsEnabled}"
+						android:id="@+id/btnEndTime"
+						android:layout_width="wrap_content"
+						android:layout_height="0dp"
+						android:layout_marginEnd="5dp"
+						android:background="@android:color/transparent"
+						app:layout_constraintBottom_toBottomOf="@id/tilEndTime"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintTop_toTopOf="@id/tilEndTime"
+						app:srcCompat="@drawable/ic_timer_48" />
+					
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/fabDone2"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginTop="5dp"
+						android:layout_marginEnd="5dp"
+						android:backgroundTint="@color/teal_200"
+						android:visibility="gone"
+						app:elevation="0dp"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintEnd_toStartOf="@id/fabCancel2"
+						app:layout_constraintTop_toBottomOf="@id/tilEndTime"
+						app:srcCompat="@drawable/ic_done_24"
+						tools:visibility="visible" />
+					
+					
+					<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/fabCancel2"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginTop="5dp"
+						android:backgroundTint="@color/red"
+						android:visibility="gone"
+						app:elevation="0dp"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintEnd_toEndOf="@id/tilEndTime"
+						app:layout_constraintTop_toBottomOf="@id/tilEndTime"
+						app:srcCompat="@drawable/ic_cancel_24"
+						tools:layout_editor_absoluteX="248dp"
+						tools:visibility="visible" />
+				
+				</androidx.constraintlayout.widget.ConstraintLayout>
+			</com.google.android.material.card.MaterialCardView>
+		
+		</androidx.constraintlayout.widget.ConstraintLayout>
+		
+	</ScrollView>
+	
+	
+</layout>
+
