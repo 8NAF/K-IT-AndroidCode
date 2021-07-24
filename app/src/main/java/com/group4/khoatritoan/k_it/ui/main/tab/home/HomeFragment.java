@@ -34,6 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.group4.khoatritoan.k_it.R;
 import com.group4.khoatritoan.k_it.custom.Utility;
 import com.group4.khoatritoan.k_it.databinding.FragmentHomeBinding;
+import com.group4.khoatritoan.k_it.repository.HomeRepository;
 import com.group4.khoatritoan.k_it.service.EndTimeReceiver;
 import com.group4.khoatritoan.k_it.service.StartTimeReceiver;
 
@@ -357,9 +358,31 @@ public class HomeFragment extends Fragment {
 	}
 
 	@Override
+	public void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		HomeRepository.getInstance().setTurnOnNotification(getContext(),
+				homeViewModel.getIsTurnOnNotification().getValue());
+	}
+
+	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
 		binding = null;
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
 	}
 
 }
