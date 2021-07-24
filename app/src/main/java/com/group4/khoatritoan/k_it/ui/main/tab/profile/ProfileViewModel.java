@@ -1,11 +1,9 @@
 package com.group4.khoatritoan.k_it.ui.main.tab.profile;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;

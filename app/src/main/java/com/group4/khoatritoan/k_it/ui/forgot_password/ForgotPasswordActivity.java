@@ -9,7 +9,6 @@ import android.os.Bundle;
 
 import com.group4.khoatritoan.k_it.R;
 import com.group4.khoatritoan.k_it.databinding.ActivityForgotPasswordBinding;
-import com.group4.khoatritoan.k_it.ui.login.LoginViewModel;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 

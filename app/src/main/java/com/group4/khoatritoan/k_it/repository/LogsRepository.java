@@ -1,9 +1,6 @@
 package com.group4.khoatritoan.k_it.repository;
 
-import android.util.Log;
-
 import androidx.core.util.Pair;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.SavedStateHandle;
 
@@ -11,10 +8,7 @@ import com.group4.khoatritoan.k_it.custom.Utility;
 import com.group4.khoatritoan.k_it.model.NotificationModel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class LogsRepository {
 

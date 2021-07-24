@@ -8,7 +8,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -21,10 +20,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.group4.khoatritoan.k_it.R;
 import com.group4.khoatritoan.k_it.repository.DatabasePath;
 import com.group4.khoatritoan.k_it.repository.HomeRepository;
-
-import static android.content.Context.MODE_PRIVATE;
-import static com.group4.khoatritoan.k_it.repository.HomeRepository.AUTO_MODE_GROUP;
-import static com.group4.khoatritoan.k_it.repository.HomeRepository.IS_TURN_ON_MODE;
 
 public class StartTimeReceiver extends BroadcastReceiver {
 
