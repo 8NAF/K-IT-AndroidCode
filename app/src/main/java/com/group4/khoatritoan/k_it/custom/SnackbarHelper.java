@@ -4,13 +4,13 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.TextView;
 
-
 import com.google.android.material.snackbar.Snackbar;
 import com.group4.khoatritoan.k_it.R;
 
-public class MySnackbar {
 
-	private MySnackbar() {}
+public class SnackbarHelper {
+
+	private SnackbarHelper() {}
 
 	public static void show (View parent, String message, Snackbar.Callback callback) {
 
@@ -32,5 +32,4 @@ public class MySnackbar {
 		}
 		snackbar.show();
 	}
-
 }

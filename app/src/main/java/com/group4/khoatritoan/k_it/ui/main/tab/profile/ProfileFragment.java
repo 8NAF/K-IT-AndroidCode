@@ -11,15 +11,16 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
 import com.group4.khoatritoan.k_it.R;
 import com.group4.khoatritoan.k_it.databinding.FragmentProfileBinding;
 
+//TODO: Chưa xử lý được khi người dùng gỡ cài đặt hoặc xóa dữ liệu app
+//Cần xét turnOnNotification thành false
 
 public class ProfileFragment extends Fragment {
 
-	private ProfileViewModel profileViewModel;
 	private FragmentProfileBinding binding;
+	private ProfileViewModel profileViewModel;
 
 	public View onCreateView(@NonNull LayoutInflater inflater,
 							 ViewGroup container, Bundle savedInstanceState) {
@@ -28,9 +29,6 @@ public class ProfileFragment extends Fragment {
 		binding.setLifecycleOwner(getViewLifecycleOwner());
 
 		profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-
-		FirebaseAuth auth = FirebaseAuth.getInstance();
-		binding.setUser(auth.getCurrentUser());
 		binding.setViewModel(profileViewModel);
 
 		FloatingActionButton fabSignOut = binding.fabSignOut;
@@ -38,8 +36,7 @@ public class ProfileFragment extends Fragment {
 			fabSignOut.setTooltipText(getString(R.string.label_sign_out));
 		}
 
-		View root = binding.getRoot();
-		return root;
+		return binding.getRoot();
 	}
 
 	@Override
@@ -47,5 +44,4 @@ public class ProfileFragment extends Fragment {
 		super.onDestroyView();
 		binding = null;
 	}
-
 }

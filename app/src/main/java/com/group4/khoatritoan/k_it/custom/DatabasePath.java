@@ -1,4 +1,4 @@
-package com.group4.khoatritoan.k_it.repository;
+package com.group4.khoatritoan.k_it.custom;
 
 public class DatabasePath {
 
@@ -12,5 +12,4 @@ public class DatabasePath {
 	public final static String DELAY_NOTIFICATION_SECONDS_PATH = APPLICATION_CONFIGURATION_PATH + "/delayNotificationSeconds";
 	public final static String MAX_DELAY_SECONDS_PATH = APPLICATION_CONFIGURATION_PATH + "/maxDelaySeconds";
 	public final static String MIN_DELAY_SECONDS_PATH = APPLICATION_CONFIGURATION_PATH + "/minDelaySeconds";
-
 }

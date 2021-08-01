@@ -15,38 +15,50 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.group4.khoatritoan.k_it.R;
-import com.group4.khoatritoan.k_it.repository.DatabasePath;
-import com.group4.khoatritoan.k_it.repository.HomeRepository;
+import com.group4.khoatritoan.k_it.model.HomeModel;
+
+import static com.group4.khoatritoan.k_it.custom.MyKey.TRIGGER_MILLISECONDS;
+
 
 public class StartTimeReceiver extends BroadcastReceiver {
 
 	private Context context;
 	private Intent intent;
 	private boolean isTurnOnMode;
+	private HomeModel model;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		this.context = context;
 		this.intent = intent;
+		this.model = new HomeModel(context);
 
 		repeating();
-		isTurnOnMode = HomeRepository.getInstance().getIsTurnOnMode(context).getValue();
-		updateTurnOnNotificationToRepository();
-		updateTurnOnNotificationToFirebase();
+		isTurnOnMode = model.getIsTurnOnMode().getValue();
+		updateTurnOnNotification();
 	}
 
+	private void updateTurnOnNotification() {
+		model.setTurnOnNotification(isTurnOnMode, task -> {
+			if (task.isSuccessful()) {
+				Log.e("AlarmManager", "start - set turnOnNotification success: " + isTurnOnMode);
+				notifyToClient();
+			}
+			else {
+				Log.e("AlarmManager", "start - set turnOnNotification error: " + task.getException());
+			}
+		});
+	}
 
 	private void repeating() {
-		long triggerMilliseconds = intent.getLongExtra("triggerMilliseconds", 0);
+		long triggerMilliseconds = intent.getLongExtra(TRIGGER_MILLISECONDS, 0);
 		triggerMilliseconds += AlarmManager.INTERVAL_DAY;
 
-		Log.e("next", "start: " + triggerMilliseconds);
+		Log.e("AlarmManager", "next start at: " + triggerMilliseconds);
 
 		Intent intent = new Intent(context, StartTimeReceiver.class);
-		intent.putExtra("triggerMilliseconds", triggerMilliseconds);
+		intent.putExtra(TRIGGER_MILLISECONDS, triggerMilliseconds);
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1,
 				intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
@@ -54,31 +66,6 @@ public class StartTimeReceiver extends BroadcastReceiver {
 				.getSystemService(Context.ALARM_SERVICE);
 		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
 				triggerMilliseconds, pendingIntent);
-	}
-
-//	private boolean getIsTurnOnMode() {
-//
-//		SharedPreferences sp = context.getSharedPreferences(AUTO_MODE_GROUP, MODE_PRIVATE);
-//		return sp.getBoolean(IS_TURN_ON_MODE, true);
-//	}
-
-	private void updateTurnOnNotificationToRepository() {
-		HomeRepository.getInstance().setTurnOnNotification(context, isTurnOnMode);
-	}
-
-	private void updateTurnOnNotificationToFirebase() {
-
-		FirebaseDatabase database = FirebaseDatabase.getInstance();
-		DatabaseReference ref = database.getReference(DatabasePath.TURN_ON_NOTIFICATION_PATH);
-		ref.setValue(isTurnOnMode).addOnCompleteListener(task -> {
-			if (task.isSuccessful()) {
-				Log.e("start TON", "success: " + isTurnOnMode);
-				notifyToClient();
-			}
-			else {
-				Log.e("start TON", "error: " + task.getException());
-			}
-		});
 	}
 
 	private void notifyToClient() {

@@ -1,85 +1,117 @@
 package com.group4.khoatritoan.k_it.ui.main.tab.home;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.app.Application;
 import android.util.Log;
+import android.view.View;
 
 import androidx.core.util.Pair;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.group4.khoatritoan.k_it.repository.HomeRepository;
+import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.group4.khoatritoan.k_it.R;
+import com.group4.khoatritoan.k_it.custom.AlarmManagerHelper;
+import com.group4.khoatritoan.k_it.custom.SkippableObserver;
+import com.group4.khoatritoan.k_it.model.HomeModel;
 
 import java.util.Map;
 
-import static android.content.Context.MODE_PRIVATE;
-import static com.group4.khoatritoan.k_it.repository.DatabasePath.DELAY_NOTIFICATION_SECONDS_PATH;
-import static com.group4.khoatritoan.k_it.repository.DatabasePath.TURN_ON_NOTIFICATION_PATH;
-import static com.group4.khoatritoan.k_it.repository.HomeRepository.AUTO_MODE_GROUP;
-import static com.group4.khoatritoan.k_it.repository.HomeRepository.AUTO_MODE_IS_ENABLED;
-import static com.group4.khoatritoan.k_it.repository.HomeRepository.CURRENT_MINUTE;
-import static com.group4.khoatritoan.k_it.repository.HomeRepository.CURRENT_SECOND;
-import static com.group4.khoatritoan.k_it.repository.HomeRepository.END_TIME;
-import static com.group4.khoatritoan.k_it.repository.HomeRepository.IS_TURN_ON_MODE;
-import static com.group4.khoatritoan.k_it.repository.HomeRepository.START_TIME;
+import static com.group4.khoatritoan.k_it.custom.MyKey.CURRENT_MINUTE;
+import static com.group4.khoatritoan.k_it.custom.MyKey.CURRENT_SECOND;
+import static com.group4.khoatritoan.k_it.custom.Utility.getStringFromTime;
 
-public class HomeViewModel extends ViewModel {
 
-	private static final FirebaseDatabase database = FirebaseDatabase.getInstance();
-	private static final HomeRepository repository = HomeRepository.getInstance();
+public class HomeViewModel extends AndroidViewModel {
 
-	private MutableLiveData<Boolean> isTurnOnNotification;
+	//#region Observer
+	public final SkippableObserver<Integer> currentMinuteObserver = new SkippableObserver<Integer>() {
+		@Override
+		public void onChanged(Integer value) {
+			if (getIsSkip()) {
+				setIsSkip(false);
+				return;
+			}
+			HomeViewModel.this.onCurrentMinuteChange(value);
+		}
+	};
 
-	public void initTurnOnNotificationGroup(Context context) {
-		isTurnOnNotification = repository.getIsTurnOnNotification(context);
+	public final SkippableObserver<Integer> currentSecondObserver = new SkippableObserver<Integer>() {
+		@Override
+		public void onChanged(Integer value) {
+			if (getIsSkip()) {
+				setIsSkip(false);
+				return;
+			}
+			HomeViewModel.this.onCurrentSecondChange(value);
+		}
+	};
+
+	public final SkippableObserver<Boolean> isTurnOnModeObserver = new SkippableObserver<Boolean>() {
+		@Override
+		public void onChanged(Boolean value) {
+			if (getIsSkip()) {
+				setIsSkip(false);
+				return;
+			}
+
+			Log.e("android:binaryCheck", "skip: false, isTurnOnMode-in: " + value);
+			Log.e("android:binaryCheck", "skip: false, isTurnOnMode-out: " + isTurnOnMode.getValue());
+			HomeViewModel.this.onIsTurnOnModeChange(value);
+		}
+	};
+
+	//#endregion
+
+	private final HomeModel model;
+	private final AlarmManagerHelper alarmManagerHelper;
+
+	public HomeViewModel(Application application) {
+		super(application);
+		model = new HomeModel(application);
+		alarmManagerHelper = new AlarmManagerHelper(application);
+
+		initTurnOnNotificationGroup();
+		initDelayNotificationSecondsGroup();
+		initAutoModeGroup();
 	}
+
+	//#region TurnOnNotificationGroup
+
+	private MutableLiveData<Boolean> turnOnNotification;
+	public MutableLiveData<Boolean> getTurnOnNotification() {
+		return turnOnNotification;
+	}
+
+	private void initTurnOnNotificationGroup() {
+		turnOnNotification = model.getTurnOnNotification();
+	}
+
+	public void updateTurnOnNotification(Boolean value) {
+
+		model.setTurnOnNotification(value, task -> {
+			if (task.isSuccessful()) {
+				Log.e("model TON success", value + "");
+			}
+			else {
+				Log.e("model TON error", task.getException() + "");
+			}
+		});
+	}
+
+	//#endregion
+
+	//#region DelayNotificationSecondsGroup
 
 	private MutableLiveData<Pair<Integer, Integer>> maxTime;
 	private MutableLiveData<Pair<Integer, Integer>> minTime;
 	private Map<String, MutableLiveData<Integer>> currentTime;
+	private MediatorLiveData<Pair<Integer, Integer>> minMaxSecond;
 
+	private MutableLiveData<Integer> visibility1;
 
-	public HomeViewModel() {
-
-//		isTurnOnNotification = repository.getIsTurnOnNotification();
-
-		maxTime = repository.getMaxTime();
-		minTime = repository.getMinTime();
-		currentTime = repository.getCurrentTime();
-	}
-
-	private MutableLiveData<Boolean> autoModeIsEnabled;
-	private MutableLiveData<Boolean> isTurnOnMode;
-	private MutableLiveData<String> startTime;
-	private MutableLiveData<String> endTime;
-
-	public void initAutoModeGroup(Context context) {
-		autoModeIsEnabled = repository.getAutoModeIsEnabled(context);
-		isTurnOnMode = repository.getIsTurnOnMode(context);
-		startTime = repository.getStartTime(context);
-		endTime = repository.getEndTime(context);
-	}
-
-	public MutableLiveData<Boolean> getAutoModeIsEnabled() {
-		return autoModeIsEnabled;
-	}
-	public MutableLiveData<Boolean> getIsTurnOnMode() {
-		return isTurnOnMode;
-	}
-	public MutableLiveData<String> getStartTime() {
-		return startTime;
-	}
-	public MutableLiveData<String> getEndTime() {
-		return endTime;
-	}
-
-
-	public MutableLiveData<Boolean> getIsTurnOnNotification() {
-		return isTurnOnNotification;
-	}
 
 	public LiveData<Pair<Integer, Integer>> getMaxTime() {
 		return maxTime;
@@ -95,31 +127,60 @@ public class HomeViewModel extends ViewModel {
 		return currentTime.get(CURRENT_MINUTE);
 	}
 
-	public void resetCurrentTime() {
-		currentTime = repository.getCurrentTime();
+	public MutableLiveData<Integer> getVisibility1() { return visibility1; }
+
+	public LiveData<Pair<Integer, Integer>> getMinMaxSecond() {
+		return minMaxSecond;
 	}
 
-	public void updateTurnOnNotificationToFirebase(Boolean value) {
 
-		DatabaseReference ref = database.getReference(TURN_ON_NOTIFICATION_PATH);
-		ref.setValue(value).addOnCompleteListener(task -> {
-			if (task.isSuccessful()) {
-				Log.e("model TON success", value + "");
-			}
-			else {
-				Log.e("model TON error", task.getException() + "");
-			}
-		});
+	private void initDelayNotificationSecondsGroup() {
+		currentMinuteObserver.setIsSkip(true);
+		currentSecondObserver.setIsSkip(true);
+
+		maxTime = model.getMaxTime();
+		minTime = model.getMinTime();
+		currentTime = model.getCurrentTime();
+
+		minMaxSecond = new MediatorLiveData<>();
+		minMaxSecond.addSource(getCurrentMinute(), this::changeLimitSecond);
+
+		visibility1 = model.getVisibility1();
 	}
 
-	public void updateDelayNotificationSecondsToFirebase() {
+	private void changeLimitSecond(Integer curMinute) {
+		int maxMinute = getMaxTime().getValue().first;
+		int minMinute = getMinTime().getValue().first;
+
+		int maxSecond = getMaxTime().getValue().second;
+		int minSecond = getMinTime().getValue().second;
+
+		int curSecond = getCurrentSecond().getValue();
+
+		if (maxMinute == minMinute) {
+			minMaxSecond.setValue(new Pair<>(minSecond, maxSecond));
+			return;
+		}
+
+		if (curMinute == maxMinute) {
+			minMaxSecond.setValue(new Pair<>(0, maxSecond));
+			getCurrentSecond().setValue(Math.min(curSecond, maxSecond));
+		}
+		else if (curMinute == minMinute) {
+			minMaxSecond.setValue(new Pair<>(minSecond, 59));
+			getCurrentSecond().setValue(Math.max(curSecond, minSecond));
+		}
+		else {
+			minMaxSecond.setValue(new Pair<>(0, 59));
+		}
+	}
+
+	private void updateDelayNotificationSeconds() {
 
 		int seconds = getCurrentMinute().getValue() * 60 + getCurrentSecond().getValue();
 
 		Log.e("update DNS", seconds + "");
-
-		DatabaseReference ref = database.getReference(DELAY_NOTIFICATION_SECONDS_PATH);
-		ref.setValue(seconds).addOnCompleteListener(task -> {
+		model.setDelayNotificationSeconds(seconds, task -> {
 			if (task.isSuccessful()) {
 				Log.e("update DNS success", seconds + "");
 			}
@@ -129,49 +190,132 @@ public class HomeViewModel extends ViewModel {
 		});
 	}
 
-	public String getStringFromTime(int hour, int minute) {
-		String result = "";
-
-		//HH:mm
-		result += (hour < 10 ? "0" : "") + hour
-				+ ":" +
-				(minute < 10 ? "0" : "") + minute;
-		return result;
+	public void onClickDone1(View view) {
+		updateDelayNotificationSeconds();
+		visibility1.setValue(View.GONE);
 	}
 
-	public Pair<Integer, Integer> getTimeToString(String timeWithoutSecond) {
+	public void onClickCancel1(View view) {
+		currentMinuteObserver.setIsSkip(true);
+		currentSecondObserver.setIsSkip(true);
 
-		int hour = Integer.parseInt(timeWithoutSecond.substring(0, 2));
-		int minute = Integer.parseInt(timeWithoutSecond.substring(3, 5));
-
-		return new Pair<>(hour, minute);
+		currentTime = model.getCurrentTime();
+		visibility1.setValue(View.GONE);
 	}
 
-	public void updateAutoModeIsEnabledToRepository(Context context, Boolean value) {
-		SharedPreferences sp = context.getSharedPreferences(AUTO_MODE_GROUP, MODE_PRIVATE);
-		sp.edit().putBoolean(AUTO_MODE_IS_ENABLED, value).apply();
+	private void onCurrentMinuteChange(Integer currentValue) {
+
+		visibility1.setValue(View.VISIBLE);
+		Log.e("onCurrentTimeChange", currentValue + "");
 	}
 
-	public void updateIsTurnOnModeToRepository(Context context, Boolean value) {
-		SharedPreferences sp = context.getSharedPreferences(AUTO_MODE_GROUP, MODE_PRIVATE);
-		sp.edit().putBoolean(IS_TURN_ON_MODE, value).apply();
+	private void onCurrentSecondChange(Integer currentValue) {
+
+		visibility1.setValue(View.VISIBLE);
+		Log.e("onCurrentTimeChange", currentValue + "");
 	}
 
-	public void updateStartTimeToRepository(Context context, String value) {
-		SharedPreferences sp = context.getSharedPreferences(AUTO_MODE_GROUP, MODE_PRIVATE);
-		sp.edit().putString(START_TIME, value).apply();
+	//#endregion
+
+	//#region AutoModeGroup
+
+	private MutableLiveData<Boolean> isAutoModeEnabled;
+	private MutableLiveData<Boolean> isTurnOnMode;
+	private MutableLiveData<String> startTime;
+	private MutableLiveData<String> endTime;
+	private MutableLiveData<Integer> visibility2;
+
+	private void initAutoModeGroup() {
+
+		Log.e("android:binaryCheck", "init");
+
+		isTurnOnModeObserver.setIsSkip(true);
+
+		isAutoModeEnabled = model.getIsAutoModeEnabled();
+		isTurnOnMode = model.getIsTurnOnMode();
+		startTime = model.getStartTime();
+		endTime = model.getEndTime();
+		visibility2 = model.getVisibility2();
 	}
 
-	public void updateEndTimeToRepository(Context context, String value) {
-		SharedPreferences sp = context.getSharedPreferences(AUTO_MODE_GROUP, MODE_PRIVATE);
-		sp.edit().putString(END_TIME, value).apply();
+	public MutableLiveData<Boolean> getIsAutoModeEnabled() {
+		return isAutoModeEnabled;
+	}
+	public MutableLiveData<Boolean> getIsTurnOnMode() {
+		return isTurnOnMode;
+	}
+	public MutableLiveData<String> getStartTime() {
+		return startTime;
+	}
+	public MutableLiveData<String> getEndTime() {
+		return endTime;
+	}
+	public MutableLiveData<Integer> getVisibility2() {
+		return visibility2;
 	}
 
-	public boolean hasReceiver(Context context) {
-		return repository.hasReceiver(context);
+	public void onClickOkTimePicker(MaterialTimePicker timePicker, MutableLiveData<String> liveData) {
+		liveData.setValue(getStringFromTime(
+				timePicker.getHour(),
+				timePicker.getMinute()
+		));
+		visibility2.setValue(View.VISIBLE);
 	}
 
-	public void setHasReceiver(Context context, boolean value) {
-		repository.setHasReceiver(context, value);
+	public void onIsAutoModeEnabledChange(Boolean enable) {
+		if (enable) {
+			if (!model.getHasReceiver()) {
+				visibility2.setValue(View.VISIBLE);
+			}
+		}
+		else {
+			model.setIsAutoModeEnabled(false);
+			alarmManagerHelper.cancel();
+			visibility2.setValue(View.GONE);
+		}
 	}
+
+	private void onIsTurnOnModeChange(Boolean isTurnOnMode) {
+		visibility2.setValue(View.VISIBLE);
+	}
+
+	public void onClickDone2(View v) {
+
+		alarmManagerHelper.enforce(startTime.getValue(), endTime.getValue());
+		updateAutoModeGroup();
+		visibility2.setValue(View.GONE);
+	}
+	private void updateAutoModeGroup() {
+		model.setIsAutoModeEnabled(isAutoModeEnabled.getValue());
+		model.setIsTurnOnMode(isTurnOnMode.getValue());
+		model.setStartTime(startTime.getValue());
+		model.setEndTime(endTime.getValue());
+	}
+
+	public void onClickCancel2(View v) {
+
+		if (model.getHasReceiver()) {
+			initAutoModeGroup();
+		}
+		else {
+			getIsAutoModeEnabled().setValue(false);
+			model.setIsAutoModeEnabled(false);
+		}
+
+		getVisibility2().setValue(View.GONE);
+	}
+
+	public void onIsTurnModeChange(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
+		if (isChecked) {
+			Boolean oldValue = isTurnOnMode.getValue();
+			Boolean newValue = checkedId == R.id.btnTurnOnMode;
+			if (oldValue != newValue) {
+				getVisibility2().setValue(View.VISIBLE);
+				isTurnOnMode.setValue(newValue);
+			}
+		}
+	}
+
+	//#endregion
+
 }

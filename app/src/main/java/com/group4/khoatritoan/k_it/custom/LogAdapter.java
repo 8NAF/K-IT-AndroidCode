@@ -1,7 +1,7 @@
 package com.group4.khoatritoan.k_it.custom;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -9,9 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.group4.khoatritoan.k_it.R;
-import com.group4.khoatritoan.k_it.databinding.ItemNotificationBinding;
-import com.group4.khoatritoan.k_it.model.NotificationModel;
+import com.group4.khoatritoan.k_it.databinding.ItemLogBinding;
+import com.group4.khoatritoan.k_it.entity.Log;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -19,23 +18,22 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
-	private Context context;
-	private List<NotificationModel> listNotifications;
+public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
 
-	public NotificationAdapter(List<NotificationModel> listNotifications, Context context) {
-		this.listNotifications = listNotifications;
-		this.context = context;
+	private List<Log> logs;
+
+	public LogAdapter(List<Log> logs) {
+		this.logs = logs;
 	}
 
-	public void setListNotifications(List<NotificationModel> listNotifications) {
-		this.listNotifications = listNotifications;
+	public void setLogs(List<Log> logs) {
+		this.logs = logs;
 		this.notifyDataSetChanged();
 	}
 
-	public List<NotificationModel> getListNotifications() {
-		return listNotifications;
+	public List<Log> getLogs() {
+		return logs;
 	}
 
 
@@ -47,7 +45,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 	@NonNull @NotNull @Override
 	public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
 
-		ItemNotificationBinding binding = ItemNotificationBinding.inflate(
+		ItemLogBinding binding = ItemLogBinding.inflate(
 				LayoutInflater.from(parent.getContext()), parent, false
 		);
 		return new ViewHolder(binding);
@@ -57,38 +55,36 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 	@Override
 	public void onBindViewHolder(@NonNull @NotNull ViewHolder holder, int position) {
 
+		Log log = logs.get(position);
 
-		NotificationModel notification = listNotifications.get(position);
-
-		// Số thứ tự nên bắt đầu bằng 1 thay vì 0
+		// Số thứ tự nên bắt đầu sẽ là 1 thay vì 0
 		holder.tvNO.setText(position + 1 + "");
 
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		Date date = new Date();
 
-		date.setTime(notification.start);
+		date.setTime(log.start);
 		holder.tvStart.setText(formatter.format(date));
 
-		date.setTime(notification.end);
+		date.setTime(log.end);
 		holder.tvEnd.setText(formatter.format(date));
 
-		if (notification.isReceived) {
+		if (log.isReceived) {
 			holder.tvIsReceived.setText("✔");
-			holder.tvIsReceived.setTextColor(context.getResources().getColor(R.color.safe));
+			holder.tvIsReceived.setTextColor(Color.parseColor("#F83AD879"));
 		}
 		else {
 			holder.tvIsReceived.setText("✖");
-			holder.tvIsReceived.setTextColor(context.getResources().getColor(R.color.danger));
+			holder.tvIsReceived.setTextColor(Color.parseColor("#F8FF0000"));
 		}
 	}
 
 	@Override
 	public int getItemCount() {
-
-		if (listNotifications != null)
-			return listNotifications.size();
-		return 0;
+		return (logs != null) ? logs.size() : 0;
 	}
+
+	//#region ViewHolder
 
 	static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -97,8 +93,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 		TextView tvEnd;
 		TextView tvIsReceived;
 
-
-		public ViewHolder(ItemNotificationBinding binding) {
+		public ViewHolder(ItemLogBinding binding) {
 			super(binding.getRoot());
 
 			this.tvNO = binding.tvNO;
@@ -107,4 +102,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 			this.tvIsReceived = binding.tvIsReceived;
 		}
 	}
+
+	//#endregion
 }

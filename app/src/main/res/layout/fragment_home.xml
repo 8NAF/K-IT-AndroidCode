@@ -6,6 +6,7 @@
 	
 	<data>
 		<import type="android.text.InputType" />
+		<import type="com.group4.khoatritoan.k_it.databinding.Converter"/>
 		<variable
 			name="viewModel"
 			type="com.group4.khoatritoan.k_it.ui.main.tab.home.HomeViewModel" />
@@ -17,7 +18,7 @@
 		
 		<androidx.constraintlayout.widget.ConstraintLayout
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
+			android:layout_height="wrap_content"
 			tools:context=".ui.main.tab.home.HomeFragment">
 			
 			<com.google.android.material.card.MaterialCardView
@@ -38,7 +39,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_marginVertical="5dp"
-					android:checked="@={viewModel.isTurnOnNotification}"
+					android:checked="@={viewModel.turnOnNotification}"
 					android:text="@string/label_turn_on_notification"
 					android:textSize="@dimen/text_size_label"
 					android:thumb="@drawable/switch_thumb"
@@ -98,7 +99,6 @@
 						android:value="@={viewModel.currentMinute}"
 						app:layout_constraintStart_toEndOf="@+id/tvDelayNotification"
 						app:layout_constraintTop_toBottomOf="@+id/tvMinute" />
-					
 					<TextView
 						android:id="@+id/textView"
 						android:layout_width="5dp"
@@ -126,8 +126,8 @@
 						android:layout_width="64dp"
 						android:layout_height="wrap_content"
 						android:layout_marginStart="5dp"
-						android:maxValue="@{59}"
-						android:minValue="@{0}"
+						android:minValue="@{viewModel.minMaxSecond.first}"
+						android:maxValue="@{viewModel.minMaxSecond.second}"
 						android:value="@={viewModel.currentSecond}"
 						app:layout_constraintStart_toEndOf="@+id/textView"
 						app:layout_constraintTop_toBottomOf="@+id/tvSecond" />
@@ -137,7 +137,8 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:backgroundTint="@color/teal_200"
-						android:visibility="gone"
+						android:visibility="@{viewModel.visibility1}"
+						android:onClick="@{viewModel::onClickDone1}"
 						app:elevation="0dp"
 						android:layout_marginBottom="5dp"
 						app:layout_constraintBottom_toBottomOf="parent"
@@ -153,7 +154,8 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:backgroundTint="@color/red"
-						android:visibility="gone"
+						android:visibility="@{viewModel.visibility1}"
+						android:onClick="@{viewModel::onClickCancel1}"
 						app:elevation="0dp"
 						app:layout_constraintBottom_toBottomOf="parent"
 						android:layout_marginBottom="5dp"
@@ -167,7 +169,6 @@
 				</androidx.constraintlayout.widget.ConstraintLayout>
 			
 			</com.google.android.material.card.MaterialCardView>
-			
 			<com.google.android.material.card.MaterialCardView
 				android:id="@+id/cv3"
 				android:layout_width="match_parent"
@@ -191,7 +192,7 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:layout_gravity="center"
-						android:checked="@={viewModel.autoModeIsEnabled}"
+						android:checked="@={viewModel.isAutoModeEnabled}"
 						android:text="@string/label_auto_mode"
 						android:textSize="@dimen/text_size_label"
 						app:layout_constraintEnd_toEndOf="parent"
@@ -204,15 +205,16 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:layout_marginHorizontal="@dimen/margin_horizontal_parent"
-						app:checkedButton="@id/btnTurnOnMode"
 						app:layout_constraintEnd_toEndOf="parent"
 						app:layout_constraintStart_toStartOf="parent"
 						app:layout_constraintTop_toBottomOf="@id/swtAutoMode"
+						android:onButtonChecked="@{viewModel::onIsTurnModeChange}"
+						android:checkedId="@{Converter.booleanToIdAutoMode(viewModel.isTurnOnMode)}"
 						app:selectionRequired="true"
 						app:singleSelection="true">
 						
 						<Button
-							android:enabled="@{viewModel.autoModeIsEnabled}"
+							android:enabled="@{viewModel.isAutoModeEnabled}"
 							android:id="@+id/btnTurnOnMode"
 							style="@style/Widget.MaterialComponents.Button.OutlinedButton"
 							android:layout_width="wrap_content"
@@ -221,7 +223,7 @@
 							android:textColor="@color/safe" />
 						
 						<Button
-							android:enabled="@{viewModel.autoModeIsEnabled}"
+							android:enabled="@{viewModel.isAutoModeEnabled}"
 							android:id="@+id/btnTurnOffMode"
 							style="@style/Widget.MaterialComponents.Button.OutlinedButton"
 							android:layout_width="wrap_content"
@@ -254,7 +256,7 @@
 					</com.google.android.material.textfield.TextInputLayout>
 					
 					<ImageButton
-						android:clickable="@{viewModel.autoModeIsEnabled}"
+						android:clickable="@{viewModel.isAutoModeEnabled}"
 						android:id="@+id/btnStartTime"
 						android:layout_width="wrap_content"
 						android:layout_height="0dp"
@@ -288,7 +290,7 @@
 					</com.google.android.material.textfield.TextInputLayout>
 					
 					<ImageButton
-						android:clickable="@{viewModel.autoModeIsEnabled}"
+						android:clickable="@{viewModel.isAutoModeEnabled}"
 						android:id="@+id/btnEndTime"
 						android:layout_width="wrap_content"
 						android:layout_height="0dp"
@@ -306,7 +308,8 @@
 						android:layout_marginTop="5dp"
 						android:layout_marginEnd="5dp"
 						android:backgroundTint="@color/teal_200"
-						android:visibility="gone"
+						android:visibility="@{viewModel.visibility2}"
+						android:onClick="@{viewModel::onClickDone2}"
 						app:elevation="0dp"
 						app:layout_constraintBottom_toBottomOf="parent"
 						app:layout_constraintEnd_toStartOf="@id/fabCancel2"
@@ -321,8 +324,9 @@
 						android:layout_height="wrap_content"
 						android:layout_marginTop="5dp"
 						android:backgroundTint="@color/red"
-						android:visibility="gone"
+						android:visibility="@{viewModel.visibility2}"
 						app:elevation="0dp"
+						android:onClick="@{viewModel::onClickCancel2}"
 						app:layout_constraintBottom_toBottomOf="parent"
 						app:layout_constraintEnd_toEndOf="@id/tilEndTime"
 						app:layout_constraintTop_toBottomOf="@id/tilEndTime"

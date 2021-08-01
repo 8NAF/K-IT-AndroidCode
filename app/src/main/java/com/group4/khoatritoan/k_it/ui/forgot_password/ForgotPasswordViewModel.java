@@ -9,36 +9,30 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.FirebaseTooManyRequestsException;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.group4.khoatritoan.k_it.R;
-import com.group4.khoatritoan.k_it.custom.MySnackbar;
-
-import java.util.Locale;
+import com.group4.khoatritoan.k_it.custom.SnackbarHelper;
+import com.group4.khoatritoan.k_it.model.ForgotPasswordModel;
 
 import static com.group4.khoatritoan.k_it.custom.Utility.dismissKeyboard;
 
 public class ForgotPasswordViewModel extends ViewModel {
 
-	private MutableLiveData<String> email = new MutableLiveData<>();
+	private final ForgotPasswordModel model = new ForgotPasswordModel();
 
-	public ForgotPasswordViewModel() { }
-
+	private final MutableLiveData<String> email = new MutableLiveData<>();
 	public MutableLiveData<String> getEmail() {
 		return email;
 	}
 
 	public void onSend(View view) {
 
-		Activity activity = (Activity) view.getContext();
-		dismissKeyboard(activity);
+		dismissKeyboard(view);
 
 		try {
-			FirebaseAuth auth = FirebaseAuth.getInstance();
-			String email = getEmail().getValue();
-			auth.setLanguageCode(Locale.getDefault().getDisplayLanguage());
+			Activity activity = (Activity) view.getContext();
 
-			auth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
+			model.sendPasswordResetEmail(email.getValue(), task -> {
 				if (task.isSuccessful()) {
 					activity.setResult(Activity.RESULT_OK);
 					activity.finish();
@@ -46,20 +40,17 @@ public class ForgotPasswordViewModel extends ViewModel {
 				else {
 					handleException(view, task.getException());
 				}
-
 			});
 		}
 		catch (Exception e) {
 			handleException(view, e);
 		}
-
-
 	}
 
 	private void showErrorMessage(View parent, String errorMessage) {
 
 		Log.e("Login Error", errorMessage);
-		MySnackbar.show(parent, errorMessage, null);
+		SnackbarHelper.show(parent, errorMessage, null);
 	}
 
 	private void handleException(View view, Exception exception) {

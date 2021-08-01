@@ -13,28 +13,62 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.common.util.Strings;
 import com.google.android.material.snackbar.Snackbar;
+
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
+
 import com.group4.khoatritoan.k_it.R;
-import com.group4.khoatritoan.k_it.custom.MySnackbar;
+import com.group4.khoatritoan.k_it.custom.AlarmManagerHelper;
+import com.group4.khoatritoan.k_it.custom.SnackbarHelper;
+import com.group4.khoatritoan.k_it.model.ProfileModel;
 import com.group4.khoatritoan.k_it.ui.login.LoginActivity;
 
 import static com.group4.khoatritoan.k_it.custom.Utility.dismissKeyboard;
-
+import static com.group4.khoatritoan.k_it.custom.Utility.startAndFinishActivity;
 
 public class ProfileViewModel extends ViewModel {
 
-	private MutableLiveData<String> oldPassword = new MutableLiveData<>();
-	private MutableLiveData<String> newPassword = new MutableLiveData<>();
-	private MutableLiveData<String> confirmedNewPassword = new MutableLiveData<>();
-	private MediatorLiveData<Boolean> isEnabled = new MediatorLiveData<>();
+	//#region getter-setter
+
+	private final ProfileModel model = new ProfileModel();
+	private final MutableLiveData<String> oldPassword = new MutableLiveData<>();
+	private final MutableLiveData<String> newPassword = new MutableLiveData<>();
+	private final MutableLiveData<String> confirmedNewPassword = new MutableLiveData<>();
+	private final MediatorLiveData<Boolean> isEnabled = new MediatorLiveData<>();
+
+	public FirebaseUser getCurrentUser() {
+		return model.getCurrentUser();
+	}
+
+	public MutableLiveData<String> getNewPassword() {
+		return newPassword;
+	}
+
+	public MutableLiveData<String> getConfirmedNewPassword() {
+		return confirmedNewPassword;
+	}
+
+	public MutableLiveData<String> getOldPassword() {
+		return oldPassword;
+	}
+
+	public LiveData<Boolean> getIsEnabled() {
+		return isEnabled;
+	}
+
+	//#endregion
+
+	//#region init
 
 	public ProfileViewModel() {
+		initIsEnabled();
+	}
+
+	private void initIsEnabled() {
 		Observer<String> callback = s -> {
 
 			String _newPassword = newPassword.getValue();
@@ -55,84 +89,78 @@ public class ProfileViewModel extends ViewModel {
 		isEnabled.addSource(confirmedNewPassword, callback);
 	}
 
-	public MutableLiveData<String> getNewPassword() {
-		return newPassword;
-	}
-	public MutableLiveData<String> getConfirmedNewPassword() {
-		return confirmedNewPassword;
-	}
-	public MutableLiveData<String> getOldPassword() {
-		return oldPassword;
-	}
-	public LiveData<Boolean> getIsEnabled() {
-		return isEnabled;
-	}
+	//#endregion
+
+	//#region on-methods
 
 	public void onUpdatePassword(View view) {
 
-		Activity activity = (Activity) view.getContext();
-
-		FirebaseAuth auth = FirebaseAuth.getInstance();
-		FirebaseUser currentUser = auth.getCurrentUser();
-
-		dismissKeyboard(activity);
+		dismissKeyboard(view);
 
 		try {
 
 			AuthCredential credential = EmailAuthProvider
-					.getCredential(currentUser.getEmail(), oldPassword.getValue());
+					.getCredential(getCurrentUser().getEmail(), oldPassword.getValue());
 
-			currentUser.reauthenticate(credential)
-					.addOnCompleteListener(activity, task -> {
-						if (task.isSuccessful()) {
-							updatePassword(view);
-						}
-						else {
-							handleException(view, task.getException());
-						}
-					});
-		}
-		catch (Exception e) {
+			model.reauthenticate(credential, task -> {
+				if (task.isSuccessful()) {
+					updatePassword(view);
+					return;
+				}
+				handleException(view, task.getException());
+			});
+		} catch (Exception e) {
 			handleException(view, e);
 		}
 	}
 
 	public void onSignOut(View view) {
-		FirebaseAuth.getInstance().signOut();
+
 		Activity activity = (Activity) view.getContext();
-		activity.startActivity(new Intent(activity, LoginActivity.class));
-		activity.finish();
+
+		model.signOut(activity);
+
+		AlarmManagerHelper alarmManagerHelper = new AlarmManagerHelper(activity);
+		alarmManagerHelper.cancel();
+		startAndFinishActivity(activity, LoginActivity.class);
 	}
 
 	private void updatePassword(View view) {
-		Activity activity = (Activity) view.getContext();
-
-		FirebaseAuth auth = FirebaseAuth.getInstance();
-		FirebaseUser currentUser = auth.getCurrentUser();
 
 		try {
-			currentUser.updatePassword(newPassword.getValue())
-					.addOnSuccessListener(activity, none -> {
-						showErrorMessage(view, activity.getString(R.string.success_update_password));
-					})
-					.addOnFailureListener(activity, exception -> {
-						handleException(view, exception);
-					});
-		}
-		catch (Exception e) {
+			Activity activity = (Activity) view.getContext();
+
+			model.updatePassword(newPassword.getValue(), task -> {
+				if (!task.isSuccessful()) {
+					handleException(view, task.getException());
+					return;
+				}
+				resetPasswordFields();
+				showErrorMessage(view, activity.getString(R.string.success_update_password));
+			});
+		} catch (Exception e) {
 			handleException(view, e);
 		}
-
-
 	}
 
+	private void resetPasswordFields() {
+		oldPassword.setValue(newPassword.getValue());
+		newPassword.setValue("");
+		confirmedNewPassword.setValue("");
+	}
+
+	//#endregion
+
+	//#region handle error, exception
 	private void showErrorMessage(View parent, String errorMessage) {
+		Log.e("Update Error", errorMessage);
 		showErrorMessage(parent, errorMessage, null);
 	}
+
 	private void showErrorMessage(View parent, String errorMessage, Snackbar.Callback callback) {
 
 		Log.e("Update Error", errorMessage);
-		MySnackbar.show(parent, errorMessage, callback);
+		SnackbarHelper.show(parent, errorMessage, callback);
 	}
 
 	private void handleException(View view, Exception exception) {
@@ -141,14 +169,11 @@ public class ProfileViewModel extends ViewModel {
 
 		try {
 			throw exception;
-		}
-		catch (FirebaseTooManyRequestsException e) {
+		} catch (FirebaseTooManyRequestsException e) {
 			showErrorMessage(view, activity.getString(R.string.error_too_many_fail_auth));
-		}
-		catch (FirebaseNetworkException e) {
+		} catch (FirebaseNetworkException e) {
 			showErrorMessage(view, activity.getString(R.string.error_network));
-		}
-		catch (FirebaseAuthException e) {
+		} catch (FirebaseAuthException e) {
 
 			Log.e("Update Pass Error Code", e.getErrorCode());
 
@@ -178,15 +203,11 @@ public class ProfileViewModel extends ViewModel {
 					showErrorMessage(view, activity.getString(R.string.error_weak_password));
 					break;
 			}
-
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			showErrorMessage(view, activity.getString(R.string.error_not_provide_password));
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			showErrorMessage(view, e.getMessage());
 		}
 	}
-
+	//#endregion
 }
-

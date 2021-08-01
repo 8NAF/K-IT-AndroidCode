@@ -12,6 +12,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -23,8 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 import static androidx.core.app.NotificationCompat.VISIBILITY_PRIVATE;
-import static com.group4.khoatritoan.k_it.repository.DatabasePath.FCM_REGISTRATION_TOKEN_PATH;
-import static com.group4.khoatritoan.k_it.repository.DatabasePath.LOGS_PATH;
+import static com.group4.khoatritoan.k_it.custom.DatabasePath.FCM_REGISTRATION_TOKEN_PATH;
+import static com.group4.khoatritoan.k_it.custom.DatabasePath.LOGS_PATH;
 
 public class NotificationsService extends FirebaseMessagingService {
 
@@ -38,7 +39,7 @@ public class NotificationsService extends FirebaseMessagingService {
 	@Override
 	public void onNewToken(@NonNull @NotNull String token) {
 		super.onNewToken(token);
-		sendRegistrationToServer(token);
+		savingTokenIntoDatabase(token);
 		Log.e("token", token);
 	}
 
@@ -47,8 +48,10 @@ public class NotificationsService extends FirebaseMessagingService {
 		super.onMessageReceived(remoteMessage);
 
 		Log.d("token", "Message Notification Body: " + remoteMessage.getNotification().getBody());
-		sendNotification(remoteMessage);
-		responseToServer(remoteMessage.getData());
+		if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+			sendNotification(remoteMessage);
+			responseToServer(remoteMessage.getData());
+		}
 	}
 
 	private void responseToServer(Map<String, String> data) {
@@ -61,7 +64,7 @@ public class NotificationsService extends FirebaseMessagingService {
 		}
 	}
 
-	private void sendRegistrationToServer(String token) {
+	private void savingTokenIntoDatabase(String token) {
 		FirebaseDatabase database = FirebaseDatabase.getInstance();
 		DatabaseReference ref = database.getReference(FCM_REGISTRATION_TOKEN_PATH);
 		ref.setValue(token);

@@ -15,38 +15,38 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.group4.khoatritoan.k_it.R;
-import com.group4.khoatritoan.k_it.repository.DatabasePath;
-import com.group4.khoatritoan.k_it.repository.HomeRepository;
+import com.group4.khoatritoan.k_it.model.HomeModel;
+
+import static com.group4.khoatritoan.k_it.custom.MyKey.TRIGGER_MILLISECONDS;
 
 public class EndTimeReceiver extends BroadcastReceiver {
 
 	private Context context;
 	private Intent intent;
-	private boolean isTurnOnMode;
+	private HomeModel model;
+	private boolean isTurnOffMode;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		this.context = context;
 		this.intent = intent;
+		this.model = new HomeModel(context);
 
 		repeating();
-		isTurnOnMode = HomeRepository.getInstance().getIsTurnOnMode(context).getValue();
-		updateTurnOnNotificationToFirebase();
-		updateTurnOnNotificationToRepository();
+		isTurnOffMode = ! model.getIsTurnOnMode().getValue();
+		updateTurnOnNotification();
 	}
 
 	private void repeating() {
-		long triggerMilliseconds = intent.getLongExtra("triggerMilliseconds", 0);
+		long triggerMilliseconds = intent.getLongExtra(TRIGGER_MILLISECONDS, 0);
 		triggerMilliseconds += AlarmManager.INTERVAL_DAY;
 
-		Log.e("next", "end: " + triggerMilliseconds);
+		Log.e("AlarmManager", "next end at: " + triggerMilliseconds);
 
 		Intent intent = new Intent(context, EndTimeReceiver.class);
 
-		intent.putExtra("triggerMilliseconds", triggerMilliseconds);
+		intent.putExtra(TRIGGER_MILLISECONDS, triggerMilliseconds);
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1,
 				intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
@@ -56,32 +56,16 @@ public class EndTimeReceiver extends BroadcastReceiver {
 				triggerMilliseconds, pendingIntent);
 	}
 
-//	private boolean getIsTurnOnMode() {
-//
-//		return HomeRepository.getInstance().getIsTurnOnMode(context).getValue();
-//
-////		SharedPreferences sp = context.getSharedPreferences(AUTO_MODE_GROUP, MODE_PRIVATE);
-////		return sp.getBoolean(IS_TURN_ON_MODE, true);
-//	}
-
-	private void updateTurnOnNotificationToRepository() {
-		HomeRepository.getInstance().setTurnOnNotification(context, !isTurnOnMode);
-	}
-
-	private void updateTurnOnNotificationToFirebase() {
-
-		FirebaseDatabase database = FirebaseDatabase.getInstance();
-		DatabaseReference ref = database.getReference(DatabasePath.TURN_ON_NOTIFICATION_PATH);
-		ref.setValue(!isTurnOnMode).addOnCompleteListener(task -> {
+	private void updateTurnOnNotification() {
+		model.setTurnOnNotification(isTurnOffMode, task -> {
 			if (task.isSuccessful()) {
-				Log.e("end TON", "success: " + !isTurnOnMode);
+				Log.e("AlarmManager", "end - set turnOnNotification success: " + isTurnOffMode);
 				notifyToClient();
 			}
 			else {
-				Log.e("end TON", "error: " + task.getException());
+				Log.e("AlarmManager", "end - set turnOnNotification error: " + task.getException());
 			}
 		});
-
 	}
 
 	private void notifyToClient() {
@@ -89,8 +73,9 @@ public class EndTimeReceiver extends BroadcastReceiver {
 		String channelId = context.getString(R.string.project_id);
 		Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-		String content = isTurnOnMode ? context.getString(R.string.label_turn_off) :
-				context.getString(R.string.label_turn_on);
+		String content = isTurnOffMode ?
+				context.getString(R.string.label_turn_on) :
+				context.getString(R.string.label_turn_off);
 
 		NotificationCompat.Builder notificationBuilder =
 				new NotificationCompat.Builder(context, channelId)
@@ -103,7 +88,8 @@ public class EndTimeReceiver extends BroadcastReceiver {
 						.setDefaults(Notification.DEFAULT_ALL)
 						.setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-		NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationManager notificationManager = (NotificationManager)
+				context.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		// Since android Oreo notification channel is needed.
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

@@ -1,45 +1,37 @@
 package com.group4.khoatritoan.k_it.ui.main.tab.home;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.NumberPicker;
 
 import androidx.annotation.NonNull;
-import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.timepicker.MaterialTimePicker;
-import com.google.android.material.timepicker.TimeFormat;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.group4.khoatritoan.k_it.R;
+import com.group4.khoatritoan.k_it.custom.TimePickerHelper;
 import com.group4.khoatritoan.k_it.databinding.FragmentHomeBinding;
-import com.group4.khoatritoan.k_it.repository.HomeRepository;
-import com.group4.khoatritoan.k_it.service.EndTimeReceiver;
-import com.group4.khoatritoan.k_it.service.StartTimeReceiver;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Calendar;
+import static com.group4.khoatritoan.k_it.custom.DatabasePath.TURN_ON_NOTIFICATION_PATH;
 
-
-import static com.group4.khoatritoan.k_it.repository.DatabasePath.TURN_ON_NOTIFICATION_PATH;
 
 public class HomeFragment extends Fragment {
 
-	private HomeViewModel homeViewModel;
+	private HomeViewModel viewModel;
 	private FragmentHomeBinding binding;
+
 	private MaterialTimePicker startTimePicker;
 	private MaterialTimePicker endTimePicker;
 	private boolean is24Hour;
@@ -50,314 +42,91 @@ public class HomeFragment extends Fragment {
 		binding = FragmentHomeBinding.inflate(inflater, container, false);
 		binding.setLifecycleOwner(getViewLifecycleOwner());
 
-		homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-		binding.setViewModel(homeViewModel);
+		viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+		binding.setViewModel(viewModel);
 
-		//region CardView1
+		//CardView 1
 
-		homeViewModel.initTurnOnNotificationGroup(getContext());
-		homeViewModel.getIsTurnOnNotification().observe(getViewLifecycleOwner(), homeViewModel::updateTurnOnNotificationToFirebase);
-		//endregion
-		//region CardView2
-
-		// Max và Min của trường giây sẽ thay đổi theo số phút được chọn
-		homeViewModel.getCurrentMinute().observe(getViewLifecycleOwner(), this::changeLimitSeconds);
-
-		FloatingActionButton fabDone1 = binding.fabDone1;
-		FloatingActionButton fabCancel1 = binding.fabCancel1;
-
-		NumberPicker.OnScrollListener changeVisibility = (view, scrollState) -> {
-			fabDone1.setVisibility(View.VISIBLE);
-			fabCancel1.setVisibility(View.VISIBLE);
-		};
-		binding.npMinute.setOnScrollListener(changeVisibility);
-		binding.npSecond.setOnScrollListener(changeVisibility);
-
-		fabCancel1.setOnClickListener(v -> {
-			homeViewModel.resetCurrentTime();
-			fabDone1.setVisibility(View.GONE);
-			fabCancel1.setVisibility(View.GONE);
-		});
-
-		fabDone1.setOnClickListener(v -> {
-			homeViewModel.updateDelayNotificationSecondsToFirebase();
-			fabDone1.setVisibility(View.GONE);
-			fabCancel1.setVisibility(View.GONE);
-		});
-
-		//endregion
-		//region CardView 3
-
-		homeViewModel.initAutoModeGroup(getContext());
-
-		//autoModeIsEnabled
-		FloatingActionButton fabDone2 = binding.fabDone2;
-		FloatingActionButton fabCancel2 = binding.fabCancel2;
-
-		homeViewModel.getAutoModeIsEnabled().observe(getViewLifecycleOwner(), enable -> {
-
-			if (enable) {
-				if (! homeViewModel.hasReceiver(getContext())) {
-					fabDone2.setVisibility(View.VISIBLE);
-					fabCancel2.setVisibility(View.VISIBLE);
-				}
-			}
-			else {
-
-				homeViewModel.updateAutoModeIsEnabledToRepository(getContext(), false);
-				cancelAlertManager(StartTimeReceiver.class);
-				cancelAlertManager(EndTimeReceiver.class);
-
-				fabDone2.setVisibility(View.GONE);
-				fabCancel2.setVisibility(View.GONE);
-			}
-		});
-
-		//isTurnOnMode
-		binding.tgAutoMode.check(homeViewModel.getIsTurnOnMode().getValue() ? R.id.btnTurnOnMode : R.id.btnTurnOffMode);
-		binding.tgAutoMode.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-			if (isChecked) {
-				homeViewModel.getIsTurnOnMode().setValue(checkedId == R.id.btnTurnOnMode);
-				fabDone2.setVisibility(View.VISIBLE);
-				fabCancel2.setVisibility(View.VISIBLE);
-			}
-		});
-
-		//time picker
-		is24Hour = DateFormat.is24HourFormat(getActivity());
-
-		startTimePicker = createMaterialTimePicker(homeViewModel.getStartTime().getValue(), is24Hour);
-		binding.btnStartTime.setOnClickListener(v -> {
-			startTimePicker.show(getActivity().getSupportFragmentManager(), "TIME");
-		});
-		startTimePicker.addOnPositiveButtonClickListener(v -> {
-			homeViewModel.getStartTime().setValue(homeViewModel.getStringFromTime(
-					startTimePicker.getHour(),
-					startTimePicker.getMinute()
-			));
-			fabDone2.setVisibility(View.VISIBLE);
-			fabCancel2.setVisibility(View.VISIBLE);
-		});
-
-		endTimePicker = createMaterialTimePicker(homeViewModel.getEndTime().getValue(), is24Hour);
-		binding.btnEndTime.setOnClickListener(v -> {
-			endTimePicker.show(getActivity().getSupportFragmentManager(), "TIME");
-		});
-		endTimePicker.addOnPositiveButtonClickListener(v -> {
-			homeViewModel.getEndTime().setValue(homeViewModel.getStringFromTime(
-					endTimePicker.getHour(),
-					endTimePicker.getMinute()
-			));
-			fabDone2.setVisibility(View.VISIBLE);
-			fabCancel2.setVisibility(View.VISIBLE);
-		});
-
-		fabDone2.setOnClickListener(v ->  {
-			startAlarmManager();
-			homeViewModel.updateAutoModeIsEnabledToRepository(getContext(), homeViewModel.getAutoModeIsEnabled().getValue());
-			homeViewModel.updateIsTurnOnModeToRepository(getContext(), homeViewModel.getIsTurnOnMode().getValue());
-			homeViewModel.updateStartTimeToRepository(getContext(), homeViewModel.getStartTime().getValue());
-			homeViewModel.updateEndTimeToRepository(getContext(), homeViewModel.getEndTime().getValue());
-			fabDone2.setVisibility(View.GONE);
-			fabCancel2.setVisibility(View.GONE);
-		});
-		fabCancel2.setOnClickListener(v -> {
-			if (homeViewModel.hasReceiver(getContext())) {
-				homeViewModel.initAutoModeGroup(getContext());
-				binding.tgAutoMode.check(homeViewModel.getIsTurnOnMode().getValue() ? R.id.btnTurnOnMode : R.id.btnTurnOffMode);
-			}
-			else {
-				homeViewModel.getAutoModeIsEnabled().setValue(false);
-				homeViewModel.updateAutoModeIsEnabledToRepository(getContext(), false);
+		DatabaseReference ref = FirebaseDatabase.getInstance().getReference(TURN_ON_NOTIFICATION_PATH);
+		ref.addValueEventListener(new ValueEventListener() {
+			@Override
+			public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+				Boolean value = snapshot.getValue(Boolean.class);
+				Log.e("From", "addValueEventListener: " + value);
+				viewModel.getTurnOnNotification().setValue(value);
 			}
 
-			fabDone2.setVisibility(View.GONE);
-			fabCancel2.setVisibility(View.GONE);
+			@Override
+			public void onCancelled(@NonNull @NotNull DatabaseError error) { }
 		});
 
-		//endregion
+		viewModel.getTurnOnNotification().observe(getViewLifecycleOwner(), viewModel::updateTurnOnNotification);
+
+		//CardView 2
+
+		viewModel.getCurrentMinute().observe(getViewLifecycleOwner(), viewModel.currentMinuteObserver);
+		viewModel.getCurrentSecond().observe(getViewLifecycleOwner(), viewModel.currentSecondObserver);
+
+		//CardView3
+
+		viewModel.getIsAutoModeEnabled().observe(getViewLifecycleOwner(),
+				viewModel::onIsAutoModeEnabledChange);
+
+		Boolean isTurnOnMode = viewModel.getIsTurnOnMode().getValue();
+		binding.tgAutoMode.check(isTurnOnMode ? R.id.btnTurnOnMode : R.id.btnTurnOffMode);
+		viewModel.getIsTurnOnMode().observe(getViewLifecycleOwner(), viewModel.isTurnOnModeObserver);
+
+		setUpTimePickers();
+		startTimePicker.addOnPositiveButtonClickListener(v ->
+			viewModel.onClickOkTimePicker(startTimePicker, viewModel.getStartTime())
+		);
+		endTimePicker.addOnPositiveButtonClickListener(v ->
+				viewModel.onClickOkTimePicker(endTimePicker, viewModel.getEndTime())
+		);
 
 		return binding.getRoot();
 	}
 
-	private void cancelAlertManager(Class<? extends BroadcastReceiver> className) {
+	private void setUpTimePickers() {
+		is24Hour = DateFormat.is24HourFormat(getContext());
 
-		Log.e("cancelAlertManager", className.getName());
+		startTimePicker = TimePickerHelper.create(viewModel.getStartTime().getValue(), is24Hour);
+		binding.btnStartTime.setOnClickListener(v ->
+				startTimePicker.show(getChildFragmentManager(), "TIME")
+		);
 
-		Intent intent = new Intent(getActivity(), className);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 1, intent, 0);
-
-		AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-		alarmManager.cancel(pendingIntent);
-
-		homeViewModel.setHasReceiver(getContext(), false);
-	}
-
-
-	private void startAlarmManager() {
-
-		Calendar startCalendar = getCalendar(homeViewModel.getStartTime());
-		Calendar endCalendar = getCalendar(homeViewModel.getEndTime());
-
-		Log.e("startAlarmManager", "b start: " + startCalendar.getTimeInMillis());
-		Log.e("startAlarmManager", "b end: " + endCalendar.getTimeInMillis());
-
-		if (startCalendar.after(endCalendar) || startCalendar.equals(endCalendar)) {
-			endCalendar.add(Calendar.DATE, 1);
-		}
-
-		Log.e("startAlarmManager", "a start: " + startCalendar.getTimeInMillis());
-		Log.e("startAlarmManager", "a end: " + endCalendar.getTimeInMillis());
-
-		PendingIntent startPI = getPendingIntent(StartTimeReceiver.class,
-				startCalendar.getTimeInMillis());
-		PendingIntent endPI = getPendingIntent(EndTimeReceiver.class,
-				endCalendar.getTimeInMillis());
-
-		AlarmManager alarmManager = (AlarmManager) getActivity()
-				.getSystemService(Context.ALARM_SERVICE);
-
-		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
-				startCalendar.getTimeInMillis(), startPI);
-
-		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
-				endCalendar.getTimeInMillis(), endPI);
-
-//		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, startCalendar.getTimeInMillis(),
-//				AlarmManager.INTERVAL_DAY, startPI);
-//
-//		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, endCalendar.getTimeInMillis(),
-//				AlarmManager.INTERVAL_DAY, endPI);
-
-		homeViewModel.setHasReceiver(getContext(), true);
-	}
-
-	private Calendar getCalendar(MutableLiveData<String> timeLiveData) {
-
-		String time = timeLiveData.getValue();
-		int hour =  Integer.parseInt(time.substring(0, 2));
-		int minute = Integer.parseInt(time.substring(3, 5));
-
-		Log.e("startAlarmManager", hour + ":" + minute);
-
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.HOUR_OF_DAY, hour);
-		calendar.set(Calendar.MINUTE, minute);
-		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 0);
-
-		return calendar;
-	}
-
-	private PendingIntent getPendingIntent(Class<? extends BroadcastReceiver> className,
-										   long triggerMilliseconds) {
-		Intent intent = new Intent(getActivity(), className);
-		intent.putExtra("triggerMilliseconds", triggerMilliseconds);
-
-		return PendingIntent.getBroadcast(getActivity(), 1,
-				intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		endTimePicker = TimePickerHelper.create(viewModel.getEndTime().getValue(), is24Hour);
+		binding.btnEndTime.setOnClickListener(v -> {
+			endTimePicker.show(getChildFragmentManager(), "TIME");
+		});
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
 
-		boolean newIs24Hour = DateFormat.is24HourFormat(getActivity());
+		boolean newIs24Hour = DateFormat.is24HourFormat(getContext());
 		if (is24Hour != newIs24Hour) {
 			is24Hour = newIs24Hour;
 
-			startTimePicker= reBuildTimePicker(startTimePicker);
-			endTimePicker = reBuildTimePicker(endTimePicker);
+			String startTime = viewModel.getStartTime().getValue();
+			String endTime = viewModel.getEndTime().getValue();
 
-			homeViewModel.getStartTime().setValue(homeViewModel.getStartTime().getValue());
-			homeViewModel.getEndTime().setValue(homeViewModel.getEndTime().getValue());
-		}
+			startTimePicker = TimePickerHelper.reBuildTimePicker(startTimePicker,
+					startTime, getActivity());
+			endTimePicker = TimePickerHelper.reBuildTimePicker(endTimePicker,
+					endTime, getActivity());
 
-
-	}
-
-	private MaterialTimePicker reBuildTimePicker(MaterialTimePicker timePicker) {
-
-		boolean newIs24Hour = DateFormat.is24HourFormat(getActivity());
-		if (is24Hour != newIs24Hour) {
-
-			is24Hour = newIs24Hour;
-			MaterialTimePicker newTimePicker = createMaterialTimePicker(
-					homeViewModel.getStringFromTime(timePicker.getHour(), timePicker.getMinute()),
-					is24Hour
+			startTimePicker.addOnPositiveButtonClickListener(v ->
+					viewModel.onClickOkTimePicker(startTimePicker, viewModel.getStartTime())
+			);
+			endTimePicker.addOnPositiveButtonClickListener(v ->
+					viewModel.onClickOkTimePicker(endTimePicker, viewModel.getEndTime())
 			);
 
-			if (timePicker.isVisible()) {
-				timePicker.dismiss();
-				timePicker = newTimePicker;
-				timePicker.show(getActivity().getSupportFragmentManager(), "TIME");
-			}
-			else {
-				timePicker = newTimePicker;
-			}
+			viewModel.getStartTime().setValue(startTime);
+			viewModel.getEndTime().setValue(endTime);
 		}
-
-		return timePicker;
-	}
-
-	private MaterialTimePicker createMaterialTimePicker(String timeWithoutSecond, boolean is24Hour) {
-
-		Pair<Integer, Integer> time = homeViewModel.getTimeToString(timeWithoutSecond);
-
-		int timeFormat = is24Hour ? TimeFormat.CLOCK_24H : TimeFormat.CLOCK_12H;
-		MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder()
-				.setTimeFormat(timeFormat)
-				.setHour(time.first)
-				.setMinute(time.second);
-
-		return builder.build();
-	};
-
-
-	private void changeLimitSeconds(Integer curMinute) {
-
-		NumberPicker npSecond = binding.npSecond;
-
-		int maxMinute = homeViewModel.getMaxTime().getValue().first;
-		int minMinute = homeViewModel.getMinTime().getValue().first;
-
-		int maxSecond = homeViewModel.getMaxTime().getValue().second;
-		int minSecond = homeViewModel.getMinTime().getValue().second;
-
-		int curSecond = homeViewModel.getCurrentSecond().getValue();
-
-		if (maxMinute == minMinute) {
-			npSecond.setMaxValue(maxSecond);
-			npSecond.setMinValue(minSecond);
-			return;
-		}
-
-		if (curMinute == maxMinute) {
-			npSecond.setMaxValue(maxSecond);
-			npSecond.setMinValue(0);
-			homeViewModel.getCurrentSecond().setValue(Math.min(curSecond, maxSecond));
-		}
-		else if (curMinute == minMinute) {
-			npSecond.setMaxValue(59);
-			npSecond.setMinValue(minSecond);
-			homeViewModel.getCurrentSecond().setValue(Math.max(curSecond, minSecond));
-		}
-		else {
-			npSecond.setMaxValue(59);
-			npSecond.setMinValue(0);
-		}
-	}
-
-	@Override
-	public void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
-		super.onSaveInstanceState(outState);
-	}
-
-	@Override
-	public void onStop() {
-		super.onStop();
-		HomeRepository.getInstance().setTurnOnNotification(getContext(),
-				homeViewModel.getIsTurnOnNotification().getValue());
 	}
 
 	@Override
@@ -365,15 +134,4 @@ public class HomeFragment extends Fragment {
 		super.onDestroyView();
 		binding = null;
 	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
-
-	@Override
-	public void onDetach() {
-		super.onDetach();
-	}
-
 }

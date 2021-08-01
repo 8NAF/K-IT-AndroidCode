@@ -6,15 +6,22 @@
 	
 	<data>
 		<import type="android.text.InputType" />
+		
+		<variable
+			name="adapter"
+			type="com.group4.khoatritoan.k_it.custom.LogAdapter" />
+		<variable
+			name="layoutManager"
+			type="androidx.recyclerview.widget.LinearLayoutManager" />
 		<variable
 			name="viewModel"
-			type="com.group4.khoatritoan.k_it.ui.main.tab.logs.LogsViewModel" />
+			type="com.group4.khoatritoan.k_it.ui.main.tab.log.LogViewModel" />
 	</data>
 	
 	<androidx.constraintlayout.widget.ConstraintLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		tools:context=".ui.main.tab.logs.LogsFragment">
+		tools:context=".ui.main.tab.log.LogFragment">
 		
 		<com.google.android.material.textfield.TextInputLayout
 			android:id="@+id/tilStartDate"
@@ -58,7 +65,6 @@
 				android:inputType="@{InputType.TYPE_NULL}"
 				android:date="@{viewModel.startEndMilliseconds.second}" />
 		</com.google.android.material.textfield.TextInputLayout>
-		
 		<com.google.android.material.button.MaterialButton
 			android:id="@+id/btnSelectDate"
 			android:layout_width="wrap_content"
@@ -83,11 +89,11 @@
 			android:background="@android:color/transparent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toBottomOf="@id/btnSelectDate" />
-		
-		
 		<com.google.android.material.button.MaterialButtonToggleGroup
 			android:id="@+id/tgIsReceived"
 			android:layout_width="wrap_content"
+			android:mapButtons="@{viewModel.mapButtons}"
+			android:onButtonChecked="@{viewModel::onButtonChecked}"
 			android:layout_height="wrap_content"
 			android:layout_marginHorizontal="@dimen/margin_horizontal_parent"
 			app:layout_constraintEnd_toEndOf="parent"
@@ -98,7 +104,7 @@
 			<Button
 				android:id="@+id/btnTrue"
 				style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-				android:layout_width="50dp"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:text="✔"
 				android:textColor="@color/safe" />
@@ -106,13 +112,12 @@
 			<Button
 				android:id="@+id/btnFalse"
 				style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-				android:layout_width="50dp"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:text="✖"
 				android:textColor="@color/danger" />
 		
 		</com.google.android.material.button.MaterialButtonToggleGroup>
-		
 		<androidx.constraintlayout.widget.Barrier
 			android:id="@+id/barrier1"
 			android:layout_width="wrap_content"
@@ -122,7 +127,6 @@
 			tools:layout_editor_absoluteX="177dp"
 			tools:layout_editor_absoluteY="405dp" />
 		
-		
 		<View
 			android:id="@+id/view_offset_helper"
 			android:layout_width="match_parent"
@@ -130,16 +134,18 @@
 			android:layout_marginHorizontal="@dimen/margin_horizontal_parent"
 			android:layout_marginVertical="5dp"
 			android:background="#E91E63"
-			app:layout_constraintBottom_toTopOf="@id/rvNotifications"
+			app:layout_constraintBottom_toTopOf="@id/rvLogs"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toBottomOf="@+id/barrier1" />
-		
 		<androidx.recyclerview.widget.RecyclerView
-			android:id="@+id/rvNotifications"
+			android:id="@+id/rvLogs"
 			android:layout_width="match_parent"
 			android:layout_height="0dp"
 			android:layout_marginTop="5dp"
+			android:layoutManager="@{layoutManager}"
+			android:adapter="@{adapter}"
+			android:hasFixedSize="@{true}"
 			android:layout_marginHorizontal="@dimen/margin_horizontal_parent"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
@@ -154,13 +160,13 @@
 			android:id="@+id/tvNoNotification"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:visibility="@{viewModel.listNotifications.size == 0 ? 0 : 4}"
+			android:visibility="@{viewModel.logs.size == 0 ? 0 : 4}"
 			android:textColor="@color/teal_200"
 			android:textSize="@dimen/title_medium"
 			android:text="@string/label_no_notification"
-			app:layout_constraintBottom_toBottomOf="@+id/rvNotifications"
+			app:layout_constraintBottom_toBottomOf="@+id/rvLogs"
 			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="@+id/rvNotifications"
+			app:layout_constraintStart_toStartOf="@+id/rvLogs"
 			app:layout_constraintTop_toBottomOf="@+id/tgIsReceived" />
 	
 	</androidx.constraintlayout.widget.ConstraintLayout>

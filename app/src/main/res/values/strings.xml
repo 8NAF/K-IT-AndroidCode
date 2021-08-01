@@ -45,15 +45,15 @@
 	<string name="success_send_reset_password">Đã gửi yêu cầu đến email của bạn</string>
 	
 	<string name="title_home">Trang chủ</string>
-	<string name="title_logs">Nhật ký</string>
+	<string name="title_log">Nhật ký</string>
 	<string name="title_profile">Thông tin người dùng</string>
 	<string name="title_reset_password">Đặt lại mật khẩu</string>
 	<string name="label_auto_mode">Tự động bật tắt nhận thông báo</string>
 	<string name="label_auto_on">Tự động bật</string>
 	<string name="label_auto_off">Tự động tắt</string>
 	<string name="title_notification">Thông báo</string>
-	<string name="title_start_change_turn_on_notification">Bắt đầu thay đổi</string>
-	<string name="title_end_change_turn_on_notification">Kết thúc thay đổi</string>
+	<string name="title_start_change_turn_on_notification">Chế độ tự động đã bắt đầu</string>
+	<string name="title_end_change_turn_on_notification">Chế độ tự động đã kết thúc</string>
 	<string name="label_turn_on">Bật nhận thông báo</string>
 	<string name="label_turn_off">Tắt nhận thông báo</string>
 </resources>
