@@ -6,6 +6,7 @@
 	
 	<data>
 		<import type="android.text.InputType" />
+		<import type="com.group4.khoatritoan.k_it.databinding.Converter"/>
 		
 		<variable
 			name="adapter"
@@ -42,7 +43,7 @@
 				android:textColor="@color/black"
 				android:hint="@string/label_from"
 				android:inputType="@{InputType.TYPE_NULL}"
-				android:date="@{viewModel.startEndMilliseconds.first}" />
+				android:text="@{Converter.millisecondToDate(viewModel.startEndMilliseconds.first)}" />
 		</com.google.android.material.textfield.TextInputLayout>
 		<com.google.android.material.textfield.TextInputLayout
 			android:id="@+id/tilEndDate"
@@ -63,7 +64,7 @@
 				android:textColor="@color/black"
 				android:hint="@string/label_to"
 				android:inputType="@{InputType.TYPE_NULL}"
-				android:date="@{viewModel.startEndMilliseconds.second}" />
+				android:text="@{Converter.millisecondToDate(viewModel.startEndMilliseconds.second)}" />
 		</com.google.android.material.textfield.TextInputLayout>
 		<com.google.android.material.button.MaterialButton
 			android:id="@+id/btnSelectDate"

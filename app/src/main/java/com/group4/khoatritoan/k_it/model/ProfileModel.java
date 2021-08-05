@@ -31,13 +31,16 @@ public class ProfileModel {
 
 	public void signOut(Context context) {
 
+		// Tắt nhận thông báo
 		FirebaseDatabase database = FirebaseDatabase.getInstance();
 		DatabaseReference ref = database.getReference(TURN_ON_NOTIFICATION_PATH);
 		ref.setValue(false);
 
+		// Đặt lại toàn bộ cái thiết lập trong HomeFragment
 		LocalRepository repository = new LocalRepository(context);
 		repository.resetHomeConfig();
 
+		// Đăng xuất
 		FirebaseAuth.getInstance().signOut();
 	}
 

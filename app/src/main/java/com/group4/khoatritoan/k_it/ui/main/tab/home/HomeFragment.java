@@ -2,7 +2,6 @@ package com.group4.khoatritoan.k_it.ui.main.tab.home;
 
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,18 +12,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.timepicker.MaterialTimePicker;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.group4.khoatritoan.k_it.R;
 import com.group4.khoatritoan.k_it.custom.TimePickerHelper;
 import com.group4.khoatritoan.k_it.databinding.FragmentHomeBinding;
-
-import org.jetbrains.annotations.NotNull;
-
-import static com.group4.khoatritoan.k_it.custom.DatabasePath.TURN_ON_NOTIFICATION_PATH;
 
 
 public class HomeFragment extends Fragment {
@@ -46,19 +36,6 @@ public class HomeFragment extends Fragment {
 		binding.setViewModel(viewModel);
 
 		//CardView 1
-
-		DatabaseReference ref = FirebaseDatabase.getInstance().getReference(TURN_ON_NOTIFICATION_PATH);
-		ref.addValueEventListener(new ValueEventListener() {
-			@Override
-			public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-				Boolean value = snapshot.getValue(Boolean.class);
-				Log.e("From", "addValueEventListener: " + value);
-				viewModel.getTurnOnNotification().setValue(value);
-			}
-
-			@Override
-			public void onCancelled(@NonNull @NotNull DatabaseError error) { }
-		});
 
 		viewModel.getTurnOnNotification().observe(getViewLifecycleOwner(), viewModel::updateTurnOnNotification);
 
@@ -109,13 +86,11 @@ public class HomeFragment extends Fragment {
 		if (is24Hour != newIs24Hour) {
 			is24Hour = newIs24Hour;
 
-			String startTime = viewModel.getStartTime().getValue();
-			String endTime = viewModel.getEndTime().getValue();
+			Long startTime = viewModel.getStartTime().getValue();
+			Long endTime = viewModel.getEndTime().getValue();
 
-			startTimePicker = TimePickerHelper.reBuildTimePicker(startTimePicker,
-					startTime, getActivity());
-			endTimePicker = TimePickerHelper.reBuildTimePicker(endTimePicker,
-					endTime, getActivity());
+			startTimePicker = TimePickerHelper.reBuildTimePicker(startTimePicker, startTime, getActivity());
+			endTimePicker = TimePickerHelper.reBuildTimePicker(endTimePicker, endTime, getActivity());
 
 			startTimePicker.addOnPositiveButtonClickListener(v ->
 					viewModel.onClickOkTimePicker(startTimePicker, viewModel.getStartTime())

@@ -207,28 +207,28 @@ public class HomeModel {
 		repository.setIsTurnOnMode(value);
 	}
 
-	public MutableLiveData<String> getStartTime() {
+	public MutableLiveData<Long> getStartTime() {
 
-		MutableLiveData<String> startTime = stateHandle.getLiveData(START_TIME);
-		String initialValue = repository.getStartTime();
+		MutableLiveData<Long> startTime = stateHandle.getLiveData(START_TIME);
+		long initialValue = repository.getStartTime();
 		startTime.setValue(initialValue);
 
 		return startTime;
 
 	}
-	public void setStartTime(String value) {
+	public void setStartTime(long value) {
 		repository.setStartTime(value);
 	}
 
-	public MutableLiveData<String> getEndTime() {
+	public MutableLiveData<Long> getEndTime() {
 
-		MutableLiveData<String> endTime = stateHandle.getLiveData(END_TIME);
-		String initialValue = repository.getEndTime();
+		MutableLiveData<Long> endTime = stateHandle.getLiveData(END_TIME);
+		long initialValue = repository.getEndTime();
 		endTime.setValue(initialValue);
 
 		return endTime;
 	}
-	public void setEndTime(String value) {
+	public void setEndTime(long value) {
 		repository.setEndTime(value);
 	}
 

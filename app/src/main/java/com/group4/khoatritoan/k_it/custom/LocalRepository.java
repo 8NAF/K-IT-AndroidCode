@@ -13,6 +13,7 @@ import static com.group4.khoatritoan.k_it.custom.MyKey.IS_TURN_ON_MODE;
 import static com.group4.khoatritoan.k_it.custom.MyKey.START_TIME;
 import static com.group4.khoatritoan.k_it.custom.MyKey.TURN_ON_NOTIFICATION;
 import static com.group4.khoatritoan.k_it.custom.MyKey.VISIBILITY_2;
+import static com.group4.khoatritoan.k_it.custom.Utility.getStartCurrentDateMilliseconds;
 
 public class LocalRepository {
 
@@ -60,18 +61,18 @@ public class LocalRepository {
 		putBoolean(IS_TURN_ON_MODE, value);
 	}
 
-	public String getStartTime() {
-		return getString(START_TIME, "00:00");
+	public long getStartTime() {
+		return getLong(START_TIME, getStartCurrentDateMilliseconds());
 	}
-	public void setStartTime(String value) {
-		putString(START_TIME, value);
+	public void setStartTime(long value) {
+		putLong(START_TIME, value);
 	}
 
-	public String getEndTime() {
-		return getString(END_TIME, "00:00");
+	public long getEndTime() {
+		return getLong(END_TIME, getStartCurrentDateMilliseconds());
 	}
-	public void setEndTime(String value) {
-		putString(END_TIME, value);
+	public void setEndTime(long value) {
+		putLong(END_TIME, value);
 	}
 
 	public int getVisibility2() {
@@ -88,9 +89,11 @@ public class LocalRepository {
 	public void resetHomeConfig() {
 		setTurnOnNotification(false);
 		setIsAutoModeEnabled(false);
-		setStartTime("00:00");
-		setEndTime("00:00");
 		setHasReceiver(false);
+
+		long time = getStartCurrentDateMilliseconds();
+		setStartTime(time);
+		setEndTime(time);
 	}
 
 	//#endregion
@@ -98,18 +101,25 @@ public class LocalRepository {
 	//#endregion
 	//#region private getter-setter
 
-	private String getString(String key, String defaultValue) {
-		return sp.getString(key, defaultValue);
-	}
-	private void putString(String key, String value) {
-		sp.edit().putString(key, value).apply();
-	}
+//	private String getString(String key, String defaultValue) {
+//		return sp.getString(key, defaultValue);
+//	}
+//	private void putString(String key, String value) {
+//		sp.edit().putString(key, value).apply();
+//	}
 
 	private int getInt(String key, int defaultValue) {
 		return sp.getInt(key, defaultValue);
 	}
 	private void putInt(String key, int value) {
 		sp.edit().putInt(key, value).apply();
+	}
+
+	private long getLong(String key, long defaultValue) {
+		return sp.getLong(key, defaultValue);
+	}
+	private void putLong(String key, long value) {
+		sp.edit().putLong(key, value).apply();
 	}
 
 	private boolean getBoolean(String key, boolean defaultValue) {

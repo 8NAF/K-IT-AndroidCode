@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static com.group4.khoatritoan.k_it.custom.MyKey.CURRENT_MINUTE;
 import static com.group4.khoatritoan.k_it.custom.MyKey.CURRENT_SECOND;
-import static com.group4.khoatritoan.k_it.custom.Utility.getStringFromTime;
+import static com.group4.khoatritoan.k_it.custom.Utility.getCurrentDateMilliseconds;
 
 
 public class HomeViewModel extends AndroidViewModel {
@@ -221,8 +221,8 @@ public class HomeViewModel extends AndroidViewModel {
 
 	private MutableLiveData<Boolean> isAutoModeEnabled;
 	private MutableLiveData<Boolean> isTurnOnMode;
-	private MutableLiveData<String> startTime;
-	private MutableLiveData<String> endTime;
+	private MutableLiveData<Long> startTime;
+	private MutableLiveData<Long> endTime;
 	private MutableLiveData<Integer> visibility2;
 
 	private void initAutoModeGroup() {
@@ -244,18 +244,18 @@ public class HomeViewModel extends AndroidViewModel {
 	public MutableLiveData<Boolean> getIsTurnOnMode() {
 		return isTurnOnMode;
 	}
-	public MutableLiveData<String> getStartTime() {
+	public MutableLiveData<Long> getStartTime() {
 		return startTime;
 	}
-	public MutableLiveData<String> getEndTime() {
+	public MutableLiveData<Long> getEndTime() {
 		return endTime;
 	}
 	public MutableLiveData<Integer> getVisibility2() {
 		return visibility2;
 	}
 
-	public void onClickOkTimePicker(MaterialTimePicker timePicker, MutableLiveData<String> liveData) {
-		liveData.setValue(getStringFromTime(
+	public void onClickOkTimePicker(MaterialTimePicker timePicker, MutableLiveData<Long> liveData) {
+		liveData.setValue(getCurrentDateMilliseconds(
 				timePicker.getHour(),
 				timePicker.getMinute()
 		));
@@ -270,6 +270,7 @@ public class HomeViewModel extends AndroidViewModel {
 		}
 		else {
 			model.setIsAutoModeEnabled(false);
+			model.setHasReceiver(false);
 			alarmManagerHelper.cancel();
 			visibility2.setValue(View.GONE);
 		}
@@ -283,6 +284,7 @@ public class HomeViewModel extends AndroidViewModel {
 
 		alarmManagerHelper.enforce(startTime.getValue(), endTime.getValue());
 		updateAutoModeGroup();
+		model.setHasReceiver(true);
 		visibility2.setValue(View.GONE);
 	}
 	private void updateAutoModeGroup() {

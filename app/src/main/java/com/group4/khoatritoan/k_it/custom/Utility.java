@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import androidx.core.util.Pair;
-
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -19,9 +17,13 @@ public class Utility {
 	}
 
 	public static long getStartCurrentDateMilliseconds() {
+		return getCurrentDateMilliseconds(0, 0);
+	}
+
+	public static long getCurrentDateMilliseconds(int hour, int minute) {
 		Calendar c = Calendar.getInstance();
-		c.set(Calendar.HOUR_OF_DAY, 0);
-		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.HOUR_OF_DAY, hour);
+		c.set(Calendar.MINUTE, minute);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 		return c.getTimeInMillis();
@@ -31,24 +33,6 @@ public class Utility {
 		Intent intent = new Intent(activity, className);
 		activity.startActivity(intent);
 		activity.finish();
-	}
-
-	public static Pair<Integer, Integer> getTimeToString(String timeWithoutSecond) {
-
-		int hour = Integer.parseInt(timeWithoutSecond.substring(0, 2));
-		int minute = Integer.parseInt(timeWithoutSecond.substring(3, 5));
-
-		return new Pair<>(hour, minute);
-	}
-
-	public static String getStringFromTime(int hour, int minute) {
-		String result = "";
-
-		//HH:mm
-		result += (hour < 10 ? "0" : "") + hour
-				+ ":" +
-				(minute < 10 ? "0" : "") + minute;
-		return result;
 	}
 
 	public static void dismissKeyboard(View view) {
