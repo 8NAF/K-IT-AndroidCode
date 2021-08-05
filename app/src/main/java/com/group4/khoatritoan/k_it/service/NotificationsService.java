@@ -3,8 +3,8 @@ package com.group4.khoatritoan.k_it.service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ContentResolver;
 import android.content.Context;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
@@ -18,22 +18,22 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.group4.khoatritoan.k_it.R;
+import com.group4.khoatritoan.k_it.repository.DatabasePath;
+import com.group4.khoatritoan.k_it.custom.NotificationHelper;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
 import static androidx.core.app.NotificationCompat.VISIBILITY_PRIVATE;
-import static com.group4.khoatritoan.k_it.custom.DatabasePath.FCM_REGISTRATION_TOKEN_PATH;
-import static com.group4.khoatritoan.k_it.custom.DatabasePath.LOGS_PATH;
+import static com.group4.khoatritoan.k_it.repository.DatabasePath.FCM_REGISTRATION_TOKEN_PATH;
+import static com.group4.khoatritoan.k_it.repository.MyKey.LOG_ID;
 
 public class NotificationsService extends FirebaseMessagingService {
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
-		Log.e("NotificationsService", "start");
 	}
 
 	@Override
@@ -47,7 +47,6 @@ public class NotificationsService extends FirebaseMessagingService {
 	public void onMessageReceived(@NonNull @NotNull RemoteMessage remoteMessage) {
 		super.onMessageReceived(remoteMessage);
 
-		Log.d("token", "Message Notification Body: " + remoteMessage.getNotification().getBody());
 		if (FirebaseAuth.getInstance().getCurrentUser() != null) {
 			sendNotification(remoteMessage);
 			responseToServer(remoteMessage.getData());
@@ -56,9 +55,9 @@ public class NotificationsService extends FirebaseMessagingService {
 
 	private void responseToServer(Map<String, String> data) {
 
-		if (data.containsKey("notificationId")) {
-			String notificationId = data.get("notificationId");
-			String isReceivedPath = LOGS_PATH + "/" + notificationId + "/" + "isReceived";
+		if (data.containsKey(LOG_ID)) {
+			String logId = data.get(LOG_ID);
+			String isReceivedPath = DatabasePath.getIsReceived(logId);
 			Log.e("isReceived path: ", isReceivedPath);
 			FirebaseDatabase.getInstance().getReference(isReceivedPath).setValue(true);
 		}
@@ -75,7 +74,8 @@ public class NotificationsService extends FirebaseMessagingService {
 		RemoteMessage.Notification firebaseNotification = remoteMessage.getNotification();
 
 		String channelId = getString(R.string.project_id);
-		Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+		Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
+				+ getPackageName() + "/" + R.raw.alert);
 
 		NotificationCompat.Builder notificationBuilder =
 				new NotificationCompat.Builder(this, channelId)
@@ -83,11 +83,10 @@ public class NotificationsService extends FirebaseMessagingService {
 						.setContentTitle(firebaseNotification.getTitle())
 						.setContentText(firebaseNotification.getBody())
 						.setAutoCancel(true)
-						.setGroup(remoteMessage.getCollapseKey())
 						.setVisibility(VISIBILITY_PRIVATE)
-						.setSound(defaultSoundUri)
-						.setDefaults(Notification.DEFAULT_ALL)
-						.setPriority(NotificationCompat.PRIORITY_MAX);
+						.setSound(soundUri)
+						.setPriority(NotificationCompat.PRIORITY_MAX)
+						.setGroup(remoteMessage.getCollapseKey());
 //						.addAction(new NotificationCompat.Action(
 //								android.R.drawable.sym_call_missed,
 //								"Cancel",
@@ -97,18 +96,18 @@ public class NotificationsService extends FirebaseMessagingService {
 //								"OK",
 //								PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT)));
 
-		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationManager notificationManager = (NotificationManager)
+				getSystemService(Context.NOTIFICATION_SERVICE);
 
-		// Since android Oreo notification channel is needed.
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			NotificationChannel channel = new NotificationChannel(
-					channelId,
-					"Default channel",
-					NotificationManager.IMPORTANCE_DEFAULT);
-
+			NotificationChannel channel = NotificationHelper.createChannel(
+					channelId, NotificationManager.IMPORTANCE_HIGH, soundUri
+			);
 			notificationManager.createNotificationChannel(channel);
 		}
 
-		notificationManager.notify(0, notificationBuilder.build());
+		Notification notification = notificationBuilder.build();
+		notification.flags = Notification.FLAG_INSISTENT;
+		notificationManager.notify(0, notification);
 	}
 }

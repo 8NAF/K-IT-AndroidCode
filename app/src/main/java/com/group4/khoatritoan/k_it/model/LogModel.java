@@ -18,11 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.group4.khoatritoan.k_it.custom.DatabasePath.LOGS_PATH;
-import static com.group4.khoatritoan.k_it.custom.MyKey.IS_NEWEST;
-import static com.group4.khoatritoan.k_it.custom.MyKey.LOGS;
-import static com.group4.khoatritoan.k_it.custom.MyKey.MAP_BUTTONS;
-import static com.group4.khoatritoan.k_it.custom.MyKey.START_END_MILLISECONDS;
+import static com.group4.khoatritoan.k_it.repository.DatabasePath.LOGS_PATH;
+import static com.group4.khoatritoan.k_it.repository.DatabasePath.START;
+import static com.group4.khoatritoan.k_it.repository.MyKey.IS_NEWEST;
+import static com.group4.khoatritoan.k_it.repository.MyKey.LOGS;
+import static com.group4.khoatritoan.k_it.repository.MyKey.MAP_BUTTONS;
+import static com.group4.khoatritoan.k_it.repository.MyKey.START_END_MILLISECONDS;
 
 public class LogModel {
 
@@ -71,13 +72,11 @@ public class LogModel {
 		FirebaseDatabase database = FirebaseDatabase.getInstance();
 		DatabaseReference ref = database.getReference(LOGS_PATH);
 		Query query = ref
-				.orderByChild("start")
+				.orderByChild(START)
 				.startAt(limit.first)
 				.endAt(limit.second);
-//					.limitToFirst(10);
+//				.limitToFirst(10);
 
 		query.addListenerForSingleValueEvent(listener);
 	}
-
-
 }

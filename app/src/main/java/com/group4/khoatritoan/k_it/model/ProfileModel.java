@@ -8,9 +8,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.group4.khoatritoan.k_it.custom.LocalRepository;
+import com.group4.khoatritoan.k_it.repository.LocalRepository;
 
-import static com.group4.khoatritoan.k_it.custom.DatabasePath.TURN_ON_NOTIFICATION_PATH;
+import static com.group4.khoatritoan.k_it.repository.DatabasePath.TURN_ON_NOTIFICATION_PATH;
 
 public class ProfileModel {
 

@@ -1,4 +1,4 @@
-package com.group4.khoatritoan.k_it.custom;
+package com.group4.khoatritoan.k_it.repository;
 
 // Class dùng để chứa các key để sử dụng cho SharedPreferences, SaveStateHandle và Intent
 public class MyKey {
@@ -23,5 +23,5 @@ public class MyKey {
 	public final static String HAS_RECEIVER = "HAS_RECEIVER";
 	public final static String VISIBILITY_2 = "VISIBILITY_2";
 
-	public final static String TRIGGER_MILLISECONDS = "TRIGGER_MILLISECONDS";
+	public final static String LOG_ID = "notificationId";
 }

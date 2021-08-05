@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.group4.khoatritoan.k_it.custom.LocalRepository;
+import com.group4.khoatritoan.k_it.repository.LocalRepository;
 
 public class TimeChangedReceiver extends BroadcastReceiver {
 

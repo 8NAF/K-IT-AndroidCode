@@ -15,28 +15,28 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.group4.khoatritoan.k_it.custom.LocalRepository;
+import com.group4.khoatritoan.k_it.repository.LocalRepository;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.group4.khoatritoan.k_it.custom.DatabasePath.DELAY_NOTIFICATION_SECONDS_PATH;
-import static com.group4.khoatritoan.k_it.custom.DatabasePath.MAX_DELAY_SECONDS_PATH;
-import static com.group4.khoatritoan.k_it.custom.DatabasePath.MIN_DELAY_SECONDS_PATH;
-import static com.group4.khoatritoan.k_it.custom.DatabasePath.TURN_ON_NOTIFICATION_PATH;
-import static com.group4.khoatritoan.k_it.custom.MyKey.CURRENT_MINUTE;
-import static com.group4.khoatritoan.k_it.custom.MyKey.CURRENT_SECOND;
-import static com.group4.khoatritoan.k_it.custom.MyKey.END_TIME;
-import static com.group4.khoatritoan.k_it.custom.MyKey.IS_AUTO_MODE_ENABLED;
-import static com.group4.khoatritoan.k_it.custom.MyKey.IS_TURN_ON_MODE;
-import static com.group4.khoatritoan.k_it.custom.MyKey.MAX_TIME;
-import static com.group4.khoatritoan.k_it.custom.MyKey.MIN_TIME;
-import static com.group4.khoatritoan.k_it.custom.MyKey.START_TIME;
-import static com.group4.khoatritoan.k_it.custom.MyKey.TURN_ON_NOTIFICATION;
-import static com.group4.khoatritoan.k_it.custom.MyKey.VISIBILITY_1;
-import static com.group4.khoatritoan.k_it.custom.MyKey.VISIBILITY_2;
+import static com.group4.khoatritoan.k_it.repository.DatabasePath.DELAY_NOTIFICATION_SECONDS_PATH;
+import static com.group4.khoatritoan.k_it.repository.DatabasePath.MAX_DELAY_SECONDS_PATH;
+import static com.group4.khoatritoan.k_it.repository.DatabasePath.MIN_DELAY_SECONDS_PATH;
+import static com.group4.khoatritoan.k_it.repository.DatabasePath.TURN_ON_NOTIFICATION_PATH;
+import static com.group4.khoatritoan.k_it.repository.MyKey.CURRENT_MINUTE;
+import static com.group4.khoatritoan.k_it.repository.MyKey.CURRENT_SECOND;
+import static com.group4.khoatritoan.k_it.repository.MyKey.END_TIME;
+import static com.group4.khoatritoan.k_it.repository.MyKey.IS_AUTO_MODE_ENABLED;
+import static com.group4.khoatritoan.k_it.repository.MyKey.IS_TURN_ON_MODE;
+import static com.group4.khoatritoan.k_it.repository.MyKey.MAX_TIME;
+import static com.group4.khoatritoan.k_it.repository.MyKey.MIN_TIME;
+import static com.group4.khoatritoan.k_it.repository.MyKey.START_TIME;
+import static com.group4.khoatritoan.k_it.repository.MyKey.TURN_ON_NOTIFICATION;
+import static com.group4.khoatritoan.k_it.repository.MyKey.VISIBILITY_1;
+import static com.group4.khoatritoan.k_it.repository.MyKey.VISIBILITY_2;
 
 
 public class HomeModel {

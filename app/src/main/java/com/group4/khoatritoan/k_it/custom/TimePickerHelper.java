@@ -46,6 +46,4 @@ public class TimePickerHelper {
 
 		return timePicker;
 	}
-
-
 }

@@ -55,15 +55,10 @@ public class AlarmManagerHelper {
 
 		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startTime, startPI);
 		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, endTime, endPI);
-
-		Log.e("AlarmManager", "setHasReceiver: true");
 	}
 
 	private PendingIntent getPendingIntent(Class<? extends BroadcastReceiver> className) {
 		Intent intent = new Intent(context, className);
-//		intent.putExtra(TRIGGER_MILLISECONDS, triggerMilliseconds);
-
-//		Log.e("AlarmManager", "putExtra(key: " + TRIGGER_MILLISECONDS + ", value: " + triggerMilliseconds + ")");
 
 		return PendingIntent.getBroadcast(context, 1, intent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
@@ -80,7 +75,7 @@ public class AlarmManagerHelper {
 
 	private void cancel(Class<? extends BroadcastReceiver> className) {
 
-		Log.e("getCalendar", "cancel: " + className.getName());
+		Log.e("AlarmManager", "cancel: " + className.getName());
 
 		Intent intent = new Intent(context, className);
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, 0);

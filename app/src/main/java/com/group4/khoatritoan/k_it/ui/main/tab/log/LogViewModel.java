@@ -161,6 +161,4 @@ public class LogViewModel extends ViewModel {
 	}
 
 	//#endregion
-
-
 }

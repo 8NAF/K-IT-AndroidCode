@@ -1,18 +1,18 @@
-package com.group4.khoatritoan.k_it.custom;
+package com.group4.khoatritoan.k_it.repository;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.View;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.group4.khoatritoan.k_it.custom.MyKey.END_TIME;
-import static com.group4.khoatritoan.k_it.custom.MyKey.HAS_RECEIVER;
-import static com.group4.khoatritoan.k_it.custom.MyKey.IS_AUTO_MODE_ENABLED;
-import static com.group4.khoatritoan.k_it.custom.MyKey.IS_FIRST_TIME_LAUNCH_APPLICATION;
-import static com.group4.khoatritoan.k_it.custom.MyKey.IS_TURN_ON_MODE;
-import static com.group4.khoatritoan.k_it.custom.MyKey.START_TIME;
-import static com.group4.khoatritoan.k_it.custom.MyKey.TURN_ON_NOTIFICATION;
-import static com.group4.khoatritoan.k_it.custom.MyKey.VISIBILITY_2;
+import static com.group4.khoatritoan.k_it.repository.MyKey.END_TIME;
+import static com.group4.khoatritoan.k_it.repository.MyKey.HAS_RECEIVER;
+import static com.group4.khoatritoan.k_it.repository.MyKey.IS_AUTO_MODE_ENABLED;
+import static com.group4.khoatritoan.k_it.repository.MyKey.IS_FIRST_TIME_LAUNCH_APPLICATION;
+import static com.group4.khoatritoan.k_it.repository.MyKey.IS_TURN_ON_MODE;
+import static com.group4.khoatritoan.k_it.repository.MyKey.START_TIME;
+import static com.group4.khoatritoan.k_it.repository.MyKey.TURN_ON_NOTIFICATION;
+import static com.group4.khoatritoan.k_it.repository.MyKey.VISIBILITY_2;
 import static com.group4.khoatritoan.k_it.custom.Utility.getStartCurrentDateMilliseconds;
 
 public class LocalRepository {

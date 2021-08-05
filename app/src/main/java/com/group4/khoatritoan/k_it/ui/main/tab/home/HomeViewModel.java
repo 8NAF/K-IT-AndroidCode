@@ -19,8 +19,8 @@ import com.group4.khoatritoan.k_it.model.HomeModel;
 
 import java.util.Map;
 
-import static com.group4.khoatritoan.k_it.custom.MyKey.CURRENT_MINUTE;
-import static com.group4.khoatritoan.k_it.custom.MyKey.CURRENT_SECOND;
+import static com.group4.khoatritoan.k_it.repository.MyKey.CURRENT_MINUTE;
+import static com.group4.khoatritoan.k_it.repository.MyKey.CURRENT_SECOND;
 import static com.group4.khoatritoan.k_it.custom.Utility.getCurrentDateMilliseconds;
 
 
@@ -319,5 +319,4 @@ public class HomeViewModel extends AndroidViewModel {
 	}
 
 	//#endregion
-
 }

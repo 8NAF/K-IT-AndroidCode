@@ -6,7 +6,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
-import com.group4.khoatritoan.k_it.custom.LocalRepository;
+import com.group4.khoatritoan.k_it.repository.LocalRepository;
 
 public class LoginModel {
 
