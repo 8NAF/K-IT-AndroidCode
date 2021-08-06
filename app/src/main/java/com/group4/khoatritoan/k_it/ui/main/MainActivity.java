@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		this.doubleBackToExitPressedOnce = true;
-		Toast.makeText(this, getString(R.string.press_back_again_to_exit), Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, getString(R.string.help_press_back_again_to_exit), Toast.LENGTH_SHORT).show();
 
 		new Handler(Looper.getMainLooper())
 				.postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);

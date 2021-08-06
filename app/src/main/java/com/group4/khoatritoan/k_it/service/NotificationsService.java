@@ -74,8 +74,6 @@ public class NotificationsService extends FirebaseMessagingService {
 
 	private void sendNotification(RemoteMessage remoteMessage) {
 
-		RemoteMessage.Notification firebaseNotification = remoteMessage.getNotification();
-
 		String channelId = getString(R.string.project_id);
 		Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
 				+ getPackageName() + "/" + R.raw.alert);
@@ -86,11 +84,14 @@ public class NotificationsService extends FirebaseMessagingService {
 				.setDestination(R.id.navigation_log)
 				.createPendingIntent();
 
+		String contentTitle = getString(R.string.label_attention);
+		String contentText = getString(R.string.label_warning_identity_theft);
+
 		NotificationCompat.Builder notificationBuilder =
 				new NotificationCompat.Builder(this, channelId)
 						.setSmallIcon(R.drawable.ic_notifications_on_24)
-						.setContentTitle(firebaseNotification.getTitle())
-						.setContentText(firebaseNotification.getBody())
+						.setContentTitle(contentTitle)
+						.setContentText(contentText)
 						.setAutoCancel(true)
 						.setContentIntent(pendingIntent)
 						.setVisibility(VISIBILITY_PRIVATE)

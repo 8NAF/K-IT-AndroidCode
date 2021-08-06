@@ -22,5 +22,5 @@ public class MyKey {
 	public final static String END_TIME = "END_TIME";
 	public final static String VISIBILITY_2 = "VISIBILITY_2";
 
-	public final static String LOG_ID = "notificationId";
+	public final static String LOG_ID = "logId";
 }

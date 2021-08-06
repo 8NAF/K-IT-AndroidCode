@@ -124,7 +124,7 @@ public class HomeModel {
 						rawSeconds / 60,
 						rawSeconds % 60
 				));
-				Log.e("Home>HomeModel", "maxTime success: " + maxTime);
+				Log.e("Home>HomeModel", "maxTime success: " + maxTime.getValue());
 			}
 			else {
 				Log.e("Home>HomeModel","maxTime error: " + task.getException());
@@ -153,7 +153,7 @@ public class HomeModel {
 					rawSeconds / 60,
 					rawSeconds % 60
 			));
-			Log.e("Home>HomeModel", "minTime success: " + minTime);
+			Log.e("Home>HomeModel", "minTime success: " + minTime.getValue());
 		});
 
 		return minTime;

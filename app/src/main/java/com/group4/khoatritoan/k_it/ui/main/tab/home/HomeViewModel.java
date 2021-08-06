@@ -59,8 +59,6 @@ public class HomeViewModel extends AndroidViewModel {
 				return;
 			}
 
-			Log.e("android:binaryCheck", "skip: false, isTurnOnMode-in: " + value);
-			Log.e("android:binaryCheck", "skip: false, isTurnOnMode-out: " + isTurnOnMode.getValue());
 			HomeViewModel.this.onIsTurnOnModeChange(value);
 		}
 	};
@@ -72,10 +70,11 @@ public class HomeViewModel extends AndroidViewModel {
 
 	public HomeViewModel(Application application) {
 		super(application);
-		model = new HomeModel(application);
-		alarmManagerHelper = new AlarmManagerHelper(application);
 
 		Log.e("Home>HomeViewModel", "init");
+
+		model = new HomeModel(application);
+		alarmManagerHelper = new AlarmManagerHelper(application);
 
 		initTurnOnNotificationGroup();
 		initDelayNotificationSecondsGroup();
@@ -90,17 +89,22 @@ public class HomeViewModel extends AndroidViewModel {
 	}
 
 	private void initTurnOnNotificationGroup() {
+
+		Log.e("Home>HomeViewModel>TONG", "init");
+		Log.e("Home>HomeViewModel>TONG", "getTurnOnNotification");
 		turnOnNotification = model.getTurnOnNotification();
 	}
 
 	public void updateTurnOnNotification(Boolean value) {
 
+		Log.e("Home>HomeViewModel>TONG", "updateTurnOnNotification: " + value);
+
 		model.setTurnOnNotification(value, task -> {
 			if (task.isSuccessful()) {
-				Log.e("model TON success", value + "");
+				Log.e("Home>HomeViewModel>TONG", "update TON success: " + value);
 			}
 			else {
-				Log.e("model TON error", task.getException() + "");
+				Log.e("Home>HomeViewModel>TONG", "model TON error: " + task.getException());
 			}
 		});
 	}
@@ -147,20 +151,23 @@ public class HomeViewModel extends AndroidViewModel {
 		currentMinuteObserver.setIsSkip(true);
 		currentSecondObserver.setIsSkip(true);
 
-		Log.e("Home>HomeViewModel>DNSG", "init maxTime");
-		Log.e("Home>HomeViewModel>DNSG", "init minTime");
-		Log.e("Home>HomeViewModel>DNSG", "init currentTime");
 		maxTime = model.getMaxTime();
 		minTime = model.getMinTime();
 		currentTime = model.getCurrentTime();
+		Log.e("Home>HomeViewModel>DNSG", "init maxTime: " + maxTime.getValue());
+		Log.e("Home>HomeViewModel>DNSG", "init minTime: " + minTime.getValue());
+		Log.e("Home>HomeViewModel>DNSG", "init currentTime: "
+				+ currentTime.get(CURRENT_MINUTE).getValue() + ":"
+				+ currentTime.get(CURRENT_SECOND).getValue());
 
 		Log.e("Home>HomeViewModel>DNSG", "init minMaxSecond");
 		Log.e("Home>HomeViewModel>DNSG", "minMaxSecond addSource: getCurrentMinute");
 		minMaxSecond = new MediatorLiveData<>();
 		minMaxSecond.addSource(getCurrentMinute(), this::changeLimitSecond);
 
-		Log.e("Home>HomeViewModel>DNSG", "init visibility1");
 		visibility1 = model.getVisibility1();
+		Log.e("Home>HomeViewModel>DNSG", "init visibility1: "
+			+ (visibility1.getValue() == View.GONE ? "View.GONE" : "View.VISIBLE"));
 	}
 
 	private void changeLimitSecond(Integer curMinute) {
@@ -186,13 +193,17 @@ public class HomeViewModel extends AndroidViewModel {
 			Log.e("Home>HomeViewModel>DNSG", "curMinute == maxMinute");
 			Log.e("Home>HomeViewModel>DNSG", "minMaxSecond: " + 0 + ", " + maxSecond);
 			minMaxSecond.setValue(new Pair<>(0, maxSecond));
-			getCurrentSecond().setValue(Math.min(curSecond, maxSecond));
+			if (curSecond > maxSecond) {
+				getCurrentSecond().setValue(maxSecond);
+			}
 		}
 		else if (curMinute == minMinute) {
 			Log.e("Home>HomeViewModel>DNSG", "curMinute == minMinute");
 			Log.e("Home>HomeViewModel>DNSG", "minMaxSecond: " + minSecond + ", " + 59);
 			minMaxSecond.setValue(new Pair<>(minSecond, 59));
-			getCurrentSecond().setValue(Math.max(curSecond, minSecond));
+			if (curSecond < minSecond) {
+				getCurrentSecond().setValue(minSecond);
+			}
 		}
 		else {
 			Log.e("Home>HomeViewModel>DNSG", "minMinute < curMinute < minMinute");
@@ -230,7 +241,6 @@ public class HomeViewModel extends AndroidViewModel {
 		Log.e("Home>HomeViewModel>DNSG", "currentSecondObserver set skip: true");
 		currentMinuteObserver.setIsSkip(true);
 		currentSecondObserver.setIsSkip(true);
-
 
 
 		currentTime = model.getCurrentTime();
