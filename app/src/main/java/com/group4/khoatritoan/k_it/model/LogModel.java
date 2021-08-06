@@ -8,7 +8,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.group4.khoatritoan.k_it.custom.Utility;
 import com.group4.khoatritoan.k_it.entity.Log;
 import com.group4.khoatritoan.k_it.R;
 
@@ -18,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.group4.khoatritoan.k_it.custom.Utility.getEndCurrentDateMilliseconds;
+import static com.group4.khoatritoan.k_it.custom.Utility.getStartCurrentDateMilliseconds;
 import static com.group4.khoatritoan.k_it.repository.DatabasePath.LOGS_PATH;
 import static com.group4.khoatritoan.k_it.repository.DatabasePath.START;
 import static com.group4.khoatritoan.k_it.repository.MyKey.IS_NEWEST;
@@ -43,8 +44,8 @@ public class LogModel {
 	//#region getter
 	public MutableLiveData<Pair<Long, Long>> getStartEndMilliseconds() {
 		return stateHandle.getLiveData(START_END_MILLISECONDS, new Pair<>(
-				Utility.getStartCurrentDateMilliseconds(),
-				Utility.getStartCurrentDateMilliseconds() + 86399999
+				getStartCurrentDateMilliseconds(),
+				getEndCurrentDateMilliseconds()
 		));
 	}
 

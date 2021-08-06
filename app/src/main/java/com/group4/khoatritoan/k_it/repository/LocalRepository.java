@@ -2,17 +2,14 @@ package com.group4.khoatritoan.k_it.repository;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.view.View;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.group4.khoatritoan.k_it.repository.MyKey.END_TIME;
-import static com.group4.khoatritoan.k_it.repository.MyKey.HAS_RECEIVER;
 import static com.group4.khoatritoan.k_it.repository.MyKey.IS_AUTO_MODE_ENABLED;
 import static com.group4.khoatritoan.k_it.repository.MyKey.IS_FIRST_TIME_LAUNCH_APPLICATION;
 import static com.group4.khoatritoan.k_it.repository.MyKey.IS_TURN_ON_MODE;
 import static com.group4.khoatritoan.k_it.repository.MyKey.START_TIME;
 import static com.group4.khoatritoan.k_it.repository.MyKey.TURN_ON_NOTIFICATION;
-import static com.group4.khoatritoan.k_it.repository.MyKey.VISIBILITY_2;
 import static com.group4.khoatritoan.k_it.custom.Utility.getStartCurrentDateMilliseconds;
 
 public class LocalRepository {
@@ -75,21 +72,9 @@ public class LocalRepository {
 		putLong(END_TIME, value);
 	}
 
-	public int getVisibility2() {
-		return getInt(VISIBILITY_2, View.GONE);
-	}
-
-	public boolean getHasReceiver() {
-		return getBoolean(HAS_RECEIVER, false);
-	}
-	public void setHasReceiver(boolean value) {
-		putBoolean(HAS_RECEIVER, value);
-	}
-
 	public void resetHomeConfig() {
 		setTurnOnNotification(false);
 		setIsAutoModeEnabled(false);
-		setHasReceiver(false);
 
 		long time = getStartCurrentDateMilliseconds();
 		setStartTime(time);
@@ -100,20 +85,6 @@ public class LocalRepository {
 
 	//#endregion
 	//#region private getter-setter
-
-//	private String getString(String key, String defaultValue) {
-//		return sp.getString(key, defaultValue);
-//	}
-//	private void putString(String key, String value) {
-//		sp.edit().putString(key, value).apply();
-//	}
-
-	private int getInt(String key, int defaultValue) {
-		return sp.getInt(key, defaultValue);
-	}
-	private void putInt(String key, int value) {
-		sp.edit().putInt(key, value).apply();
-	}
 
 	private long getLong(String key, long defaultValue) {
 		return sp.getLong(key, defaultValue);
@@ -128,6 +99,20 @@ public class LocalRepository {
 	private void putBoolean(String key, boolean value) {
 		sp.edit().putBoolean(key, value).apply();
 	}
+
+//	private String getString(String key, String defaultValue) {
+//		return sp.getString(key, defaultValue);
+//	}
+//	private void putString(String key, String value) {
+//		sp.edit().putString(key, value).apply();
+//	}
+
+//	private int getInt(String key, int defaultValue) {
+//		return sp.getInt(key, defaultValue);
+//	}
+//	private void putInt(String key, int value) {
+//		sp.edit().putInt(key, value).apply();
+//	}
 
 	//#endregion
 }

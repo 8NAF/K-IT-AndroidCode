@@ -1,5 +1,6 @@
 package com.group4.khoatritoan.k_it.ui.main.tab.home;
 
+import android.app.AlarmManager;
 import android.app.Application;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.group4.khoatritoan.k_it.custom.AlarmManagerHelper;
 import com.group4.khoatritoan.k_it.custom.SkippableObserver;
 import com.group4.khoatritoan.k_it.model.HomeModel;
 
+import java.util.Calendar;
 import java.util.Map;
 
 import static com.group4.khoatritoan.k_it.repository.MyKey.CURRENT_MINUTE;
@@ -72,6 +74,8 @@ public class HomeViewModel extends AndroidViewModel {
 		super(application);
 		model = new HomeModel(application);
 		alarmManagerHelper = new AlarmManagerHelper(application);
+
+		Log.e("Home>HomeViewModel", "init");
 
 		initTurnOnNotificationGroup();
 		initDelayNotificationSecondsGroup();
@@ -135,20 +139,34 @@ public class HomeViewModel extends AndroidViewModel {
 
 
 	private void initDelayNotificationSecondsGroup() {
+
+		Log.e("Home>HomeViewModel>DNSG", "init");
+
+		Log.e("Home>HomeViewModel>DNSG", "currentMinuteObserver skip: true");
+		Log.e("Home>HomeViewModel>DNSG", "currentSecondObserver skip: true");
 		currentMinuteObserver.setIsSkip(true);
 		currentSecondObserver.setIsSkip(true);
 
+		Log.e("Home>HomeViewModel>DNSG", "init maxTime");
+		Log.e("Home>HomeViewModel>DNSG", "init minTime");
+		Log.e("Home>HomeViewModel>DNSG", "init currentTime");
 		maxTime = model.getMaxTime();
 		minTime = model.getMinTime();
 		currentTime = model.getCurrentTime();
 
+		Log.e("Home>HomeViewModel>DNSG", "init minMaxSecond");
+		Log.e("Home>HomeViewModel>DNSG", "minMaxSecond addSource: getCurrentMinute");
 		minMaxSecond = new MediatorLiveData<>();
 		minMaxSecond.addSource(getCurrentMinute(), this::changeLimitSecond);
 
+		Log.e("Home>HomeViewModel>DNSG", "init visibility1");
 		visibility1 = model.getVisibility1();
 	}
 
 	private void changeLimitSecond(Integer curMinute) {
+
+		Log.e("Home>HomeViewModel>DNSG", "changeLimitSecond");
+
 		int maxMinute = getMaxTime().getValue().first;
 		int minMinute = getMinTime().getValue().first;
 
@@ -158,19 +176,27 @@ public class HomeViewModel extends AndroidViewModel {
 		int curSecond = getCurrentSecond().getValue();
 
 		if (maxMinute == minMinute) {
+			Log.e("Home>HomeViewModel>DNSG", "maxMinute == minMinute");
+			Log.e("Home>HomeViewModel>DNSG", "minMaxSecond: " + minSecond + ", " + maxSecond);
 			minMaxSecond.setValue(new Pair<>(minSecond, maxSecond));
 			return;
 		}
 
 		if (curMinute == maxMinute) {
+			Log.e("Home>HomeViewModel>DNSG", "curMinute == maxMinute");
+			Log.e("Home>HomeViewModel>DNSG", "minMaxSecond: " + 0 + ", " + maxSecond);
 			minMaxSecond.setValue(new Pair<>(0, maxSecond));
 			getCurrentSecond().setValue(Math.min(curSecond, maxSecond));
 		}
 		else if (curMinute == minMinute) {
+			Log.e("Home>HomeViewModel>DNSG", "curMinute == minMinute");
+			Log.e("Home>HomeViewModel>DNSG", "minMaxSecond: " + minSecond + ", " + 59);
 			minMaxSecond.setValue(new Pair<>(minSecond, 59));
 			getCurrentSecond().setValue(Math.max(curSecond, minSecond));
 		}
 		else {
+			Log.e("Home>HomeViewModel>DNSG", "minMinute < curMinute < minMinute");
+			Log.e("Home>HomeViewModel>DNSG", "minMaxSecond: " + 0 + ", " + 59);
 			minMaxSecond.setValue(new Pair<>(0, 59));
 		}
 	}
@@ -179,40 +205,53 @@ public class HomeViewModel extends AndroidViewModel {
 
 		int seconds = getCurrentMinute().getValue() * 60 + getCurrentSecond().getValue();
 
-		Log.e("update DNS", seconds + "");
+		Log.e("Home>HomeViewModel>DNSG", "update DNS: " + seconds);
 		model.setDelayNotificationSeconds(seconds, task -> {
 			if (task.isSuccessful()) {
-				Log.e("update DNS success", seconds + "");
+				Log.e("Home>HomeViewModel>DNSG", "update DNS success: " + seconds);
 			}
 			else {
-				Log.e("update DNS error", task.getException().getMessage());
+				Log.e("Home>HomeViewModel>DNSG", "update DNS error: " + task.getException());
 			}
 		});
 	}
 
 	public void onClickDone1(View view) {
+		Log.e("Home>HomeViewModel>DNSG", "onClickDone1");
 		updateDelayNotificationSeconds();
+		Log.e("Home>HomeViewModel>DNSG", "set visibility1: View.GONE");
 		visibility1.setValue(View.GONE);
 	}
 
 	public void onClickCancel1(View view) {
+		Log.e("Home>HomeViewModel>DNSG", "onClickCancel1");
+
+		Log.e("Home>HomeViewModel>DNSG", "currentMinuteObserver set skip: true");
+		Log.e("Home>HomeViewModel>DNSG", "currentSecondObserver set skip: true");
 		currentMinuteObserver.setIsSkip(true);
 		currentSecondObserver.setIsSkip(true);
 
+
+
 		currentTime = model.getCurrentTime();
 		visibility1.setValue(View.GONE);
+		Log.e("Home>HomeViewModel>DNSG", "reset currentTime: "
+				+ getCurrentMinute().getValue() + ":" + getCurrentSecond().getValue());
+		Log.e("Home>HomeViewModel>DNSG", "set visibility1: View.GONE");
 	}
 
 	private void onCurrentMinuteChange(Integer currentValue) {
 
+		Log.e("Home>HomeViewModel>DNSG", "onCurrentMinuteChange: " + currentValue);
+		Log.e("Home>HomeViewModel>DNSG", "set visibility1: View.VISIBLE");
 		visibility1.setValue(View.VISIBLE);
-		Log.e("onCurrentTimeChange", currentValue + "");
 	}
 
 	private void onCurrentSecondChange(Integer currentValue) {
 
+		Log.e("Home>HomeViewModel>DNSG", "onCurrentSecondChange: " + currentValue);
+		Log.e("Home>HomeViewModel>DNSG", "set visibility1: View.VISIBLE");
 		visibility1.setValue(View.VISIBLE);
-		Log.e("onCurrentTimeChange", currentValue + "");
 	}
 
 	//#endregion
@@ -256,8 +295,7 @@ public class HomeViewModel extends AndroidViewModel {
 
 	public void onClickOkTimePicker(MaterialTimePicker timePicker, MutableLiveData<Long> liveData) {
 		liveData.setValue(getCurrentDateMilliseconds(
-				timePicker.getHour(),
-				timePicker.getMinute()
+				timePicker.getHour(), timePicker.getMinute(), 0, 0
 		));
 		visibility2.setValue(View.VISIBLE);
 	}
@@ -270,7 +308,6 @@ public class HomeViewModel extends AndroidViewModel {
 		}
 		else {
 			model.setIsAutoModeEnabled(false);
-			model.setHasReceiver(false);
 			alarmManagerHelper.cancel();
 			visibility2.setValue(View.GONE);
 		}
@@ -282,12 +319,49 @@ public class HomeViewModel extends AndroidViewModel {
 
 	public void onClickDone2(View v) {
 
-		alarmManagerHelper.enforce(startTime.getValue(), endTime.getValue());
-		updateAutoModeGroup();
-		model.setHasReceiver(true);
+		enforce();
+		updateAutoModGroup();
 		visibility2.setValue(View.GONE);
 	}
-	private void updateAutoModeGroup() {
+
+	private void enforce() {
+
+		Calendar currentCalendar = Calendar.getInstance();
+		currentCalendar.set(Calendar.SECOND, 0);
+		currentCalendar.set(Calendar.MILLISECOND, 0);
+		long currentTime = currentCalendar.getTimeInMillis();
+		long startTime = getStartTime().getValue();
+		long endTime = getEndTime().getValue();
+
+		Log.e("AlarmManager", "enforce, before start: " + startTime);
+		Log.e("AlarmManager", "enforce, before end: " + endTime);
+		Log.e("AlarmManager", "enforce, before current: " + currentTime);
+
+		if (startTime <= currentTime) {
+			startTime += AlarmManager.INTERVAL_DAY;
+		}
+		if (endTime <= currentTime) {
+			endTime += AlarmManager.INTERVAL_DAY;
+		}
+		if (endTime <= startTime) {
+			endTime += AlarmManager.INTERVAL_DAY;
+		}
+
+		if (endTime != getEndTime().getValue()) {
+			getEndTime().setValue(endTime);
+		}
+		if (startTime != getStartTime().getValue()) {
+			getStartTime().setValue(startTime);
+		}
+
+		Log.e("AlarmManager", "enforce, after start: " + startTime);
+		Log.e("AlarmManager", "enforce, after end: " + endTime);
+		Log.e("AlarmManager", "enforce, after current: " + currentTime);
+
+		alarmManagerHelper.enforce(startTime, endTime);
+	}
+
+	private void updateAutoModGroup() {
 		model.setIsAutoModeEnabled(isAutoModeEnabled.getValue());
 		model.setIsTurnOnMode(isTurnOnMode.getValue());
 		model.setStartTime(startTime.getValue());

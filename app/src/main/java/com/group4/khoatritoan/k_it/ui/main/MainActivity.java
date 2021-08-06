@@ -1,6 +1,9 @@
 package com.group4.khoatritoan.k_it.ui.main;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -38,5 +41,20 @@ public class MainActivity extends AppCompatActivity {
 		NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
 		NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 		NavigationUI.setupWithNavController(navView, navController);
+	}
+
+	boolean doubleBackToExitPressedOnce = false;
+	@Override
+	public void onBackPressed() {
+		if (doubleBackToExitPressedOnce) {
+			this.finish();
+			return;
+		}
+
+		this.doubleBackToExitPressedOnce = true;
+		Toast.makeText(this, getString(R.string.press_back_again_to_exit), Toast.LENGTH_SHORT).show();
+
+		new Handler(Looper.getMainLooper())
+				.postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
 	}
 }

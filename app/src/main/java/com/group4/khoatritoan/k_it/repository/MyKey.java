@@ -20,7 +20,6 @@ public class MyKey {
 	public final static String IS_TURN_ON_MODE = "IS_TURN_ON_MODE";
 	public final static String START_TIME = "START_TIME";
 	public final static String END_TIME = "END_TIME";
-	public final static String HAS_RECEIVER = "HAS_RECEIVER";
 	public final static String VISIBILITY_2 = "VISIBILITY_2";
 
 	public final static String LOG_ID = "notificationId";

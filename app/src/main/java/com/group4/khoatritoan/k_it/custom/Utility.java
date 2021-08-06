@@ -17,15 +17,18 @@ public class Utility {
 	}
 
 	public static long getStartCurrentDateMilliseconds() {
-		return getCurrentDateMilliseconds(0, 0);
+		return getCurrentDateMilliseconds(0, 0, 0, 0);
+	}
+	public static long getEndCurrentDateMilliseconds() {
+		return getCurrentDateMilliseconds(23, 59, 59, 999);
 	}
 
-	public static long getCurrentDateMilliseconds(int hour, int minute) {
+	public static long getCurrentDateMilliseconds(int hour, int minute, int second, int millisecond) {
 		Calendar c = Calendar.getInstance();
 		c.set(Calendar.HOUR_OF_DAY, hour);
 		c.set(Calendar.MINUTE, minute);
-		c.set(Calendar.SECOND, 0);
-		c.set(Calendar.MILLISECOND, 0);
+		c.set(Calendar.SECOND, second);
+		c.set(Calendar.MILLISECOND, millisecond);
 		return c.getTimeInMillis();
 	}
 

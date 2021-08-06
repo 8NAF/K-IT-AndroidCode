@@ -23,6 +23,8 @@
 	<string name="label_forgot_password">Quên mật khẩu ?</string>
 	<string name="label_email">Email</string>
 	<string name="label_send">Gửi</string>
+	<string name="label_turn_on">Bật nhận thông báo</string>
+	<string name="label_turn_off">Tắt nhận thông báo</string>
 	
 	<string name="help_login">Sử dụng tài khoản mà chúng tôi\nđã cung cấp cho bạn</string>
 	
@@ -54,6 +56,7 @@
 	<string name="title_notification">Thông báo</string>
 	<string name="title_start_change_turn_on_notification">Chế độ tự động đã bắt đầu</string>
 	<string name="title_end_change_turn_on_notification">Chế độ tự động đã kết thúc</string>
-	<string name="label_turn_on">Bật nhận thông báo</string>
-	<string name="label_turn_off">Tắt nhận thông báo</string>
+	<string name="title_auto_mode_is_canceled">Chế độ tự động đã bị hủy</string>
+	<string name="label_time_changed">Do bạn đã thay đổi thời gian (ngày, giờ, phút hoặc múi giờ) của hệ thống.\nVui lòng thiết lập lại.</string>
+	<string name="press_back_again_to_exit">Nhấn trở về một lần nữa để thoát ứng dụng</string>
 </resources>

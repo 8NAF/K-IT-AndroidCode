@@ -49,6 +49,9 @@ public class HomeModel {
 	private final LocalRepository repository;
 
 	public HomeModel(Context context) {
+
+		Log.e("Home>HomeModel", "init");
+
 		stateHandle = new SavedStateHandle();
 		repository = new LocalRepository(context);
 	}
@@ -74,6 +77,8 @@ public class HomeModel {
 
 	public MutableLiveData<Boolean> getTurnOnNotification() {
 
+		Log.e("Home>HomeModel", "getTurnOnNotification");
+
 		MutableLiveData<Boolean> turnOnNotification = stateHandle.getLiveData(TURN_ON_NOTIFICATION);
 
 //		boolean initialValue = repository.getTurnOnNotification();
@@ -85,12 +90,14 @@ public class HomeModel {
 			@Override
 			public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
 				Boolean value = snapshot.getValue(Boolean.class);
-				Log.e("From", "addValueEventListener: " + value);
+				Log.e( "Home>HomeModel", "addValueEventListener success: " + value);
 				turnOnNotification.setValue(value);
 			}
 
 			@Override
-			public void onCancelled(@NonNull @NotNull DatabaseError error) { }
+			public void onCancelled(@NonNull @NotNull DatabaseError error) {
+				Log.e( "Home>HomeModel", "addValueEventListener error: " + error);
+			}
 		});
 
 		turnOnNotification.observeForever(this::syncTurnOnNotificationWithLocal);
@@ -102,6 +109,8 @@ public class HomeModel {
 	//#region DelayNotificationSecondsGroup
 
 	public MutableLiveData<Pair<Integer, Integer>> getMaxTime() {
+
+		Log.e("Home>HomeModel", "getMaxTime");
 
 		MutableLiveData<Pair<Integer, Integer>> maxTime =
 				stateHandle.getLiveData(MAX_TIME, new Pair<>(0, 0));
@@ -115,10 +124,10 @@ public class HomeModel {
 						rawSeconds / 60,
 						rawSeconds % 60
 				));
-				Log.e("maxTime success", maxTime.getValue() + "");
+				Log.e("Home>HomeModel", "maxTime success: " + maxTime);
 			}
 			else {
-				Log.e("maxTime error", task.getException().getMessage());
+				Log.e("Home>HomeModel","maxTime error: " + task.getException());
 			}
 		});
 
@@ -126,28 +135,32 @@ public class HomeModel {
 	}
 	public MutableLiveData<Pair<Integer, Integer>> getMinTime() {
 
+		Log.e("Home>HomeModel", "getMinTime");
+
 		MutableLiveData<Pair<Integer, Integer>> minTime =
 				stateHandle.getLiveData(MIN_TIME, new Pair<>(0, 0));
 
 		DatabaseReference ref = database.getReference(MIN_DELAY_SECONDS_PATH);
 		ref.get().addOnCompleteListener(task -> {
-			if (task.isSuccessful()) {
-				DataSnapshot snapshot = task.getResult();
-				Integer rawSeconds = snapshot.getValue(Integer.class);
-				minTime.setValue(new Pair<> (
-						rawSeconds / 60,
-						rawSeconds % 60
-				));
-				Log.e("minTime success", minTime + "");
+			if (!task.isSuccessful()) {
+				Log.e("Home>HomeModel", "minTime error: " + task.getException());
+				return;
 			}
-			else {
-				Log.e("minTime error", task.getException().getMessage());
-			}
+
+			DataSnapshot snapshot = task.getResult();
+			Integer rawSeconds = snapshot.getValue(Integer.class);
+			minTime.setValue(new Pair<> (
+					rawSeconds / 60,
+					rawSeconds % 60
+			));
+			Log.e("Home>HomeModel", "minTime success: " + minTime);
 		});
 
 		return minTime;
 	}
 	public Map<String, MutableLiveData<Integer>> getCurrentTime() {
+
+		Log.e("Home>HomeModel", "getCurrentTime");
 
 		Map<String, MutableLiveData<Integer>> currentTime = new HashMap<>(2);
 		currentTime.put(CURRENT_SECOND, stateHandle.getLiveData(CURRENT_SECOND));
@@ -155,28 +168,31 @@ public class HomeModel {
 
 		DatabaseReference ref = database.getReference(DELAY_NOTIFICATION_SECONDS_PATH);
 		ref.get().addOnCompleteListener(task -> {
-			if (task.isSuccessful()) {
-				DataSnapshot snapshot = task.getResult();
-				Integer rawSeconds = snapshot.getValue(Integer.class);
-				// Không được thay đổi vị trí của hai dòng bên dưới này
-				// vì minute phụ thuộc vào second
-				currentTime.get(CURRENT_SECOND).setValue(rawSeconds % 60);
-				currentTime.get(CURRENT_MINUTE).setValue(rawSeconds / 60);
-				Log.e("curTime success", rawSeconds + "");
+			if (!task.isSuccessful()) {
+				Log.e("Home>HomeModel", "curTime error: " + task.getException());
+
+				return;
 			}
-			else {
-				Log.e("curTime error", task.getException().getMessage());
-			}
+
+			DataSnapshot snapshot = task.getResult();
+			Integer rawSeconds = snapshot.getValue(Integer.class);
+			// Không được thay đổi vị trí của hai dòng bên dưới này
+			// vì minute phụ thuộc vào second
+			currentTime.get(CURRENT_SECOND).setValue(rawSeconds % 60);
+			currentTime.get(CURRENT_MINUTE).setValue(rawSeconds / 60);
+			Log.e("Home>HomeModel", "curTime success: " + rawSeconds);
 		});
 
 		return currentTime;
 	}
 
 	public MutableLiveData<Integer> getVisibility1() {
+		Log.e("Home>HomeModel", "getVisibility1");
 		return stateHandle.getLiveData(VISIBILITY_1, View.GONE);
 	}
 
 	public void setDelayNotificationSeconds(int value, OnCompleteListener<Void> callback) {
+		Log.e("Home>HomeModel", "setDelayNotificationSeconds: " + value);
 		DatabaseReference ref = database.getReference(DELAY_NOTIFICATION_SECONDS_PATH);
 		ref.setValue(value).addOnCompleteListener(callback);
 	}
@@ -184,6 +200,9 @@ public class HomeModel {
 	//#endregion
 	//#region AutoModeGroup
 
+	public boolean getHasReceiver() {
+		return repository.getIsAutoModeEnabled();
+	}
 	public MutableLiveData<Boolean> getIsAutoModeEnabled() {
 
 		MutableLiveData<Boolean> isAutoModeEnabled = stateHandle.getLiveData(IS_AUTO_MODE_ENABLED);
@@ -195,6 +214,7 @@ public class HomeModel {
 	public void setIsAutoModeEnabled(boolean value) {
 		repository.setIsAutoModeEnabled(value);
 	}
+
 
 	public MutableLiveData<Boolean> getIsTurnOnMode() {
 		MutableLiveData<Boolean> isTurnOnMode = stateHandle.getLiveData(IS_TURN_ON_MODE);
@@ -233,19 +253,8 @@ public class HomeModel {
 	}
 
 	public MutableLiveData<Integer> getVisibility2() {
-		MutableLiveData<Integer> visibility2 = stateHandle.getLiveData(VISIBILITY_2);
-		int initialValue = repository.getVisibility2();
-		visibility2.setValue(initialValue);
-
-		return visibility2;
+		return stateHandle.getLiveData(VISIBILITY_2, View.GONE);
 	}
 
-	public boolean getHasReceiver() {
-		return repository.getHasReceiver();
-	}
-	public void setHasReceiver(boolean value) {
-		repository.setHasReceiver(value);
-	}
-
-//#endregion
+	//#endregion
 }

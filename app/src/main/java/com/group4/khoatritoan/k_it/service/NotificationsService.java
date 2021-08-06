@@ -3,6 +3,7 @@ package com.group4.khoatritoan.k_it.service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.navigation.NavDeepLinkBuilder;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -20,6 +22,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.group4.khoatritoan.k_it.R;
 import com.group4.khoatritoan.k_it.repository.DatabasePath;
 import com.group4.khoatritoan.k_it.custom.NotificationHelper;
+import com.group4.khoatritoan.k_it.ui.main.MainActivity;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -77,12 +80,19 @@ public class NotificationsService extends FirebaseMessagingService {
 		Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
 				+ getPackageName() + "/" + R.raw.alert);
 
+		PendingIntent pendingIntent = new NavDeepLinkBuilder(this)
+				.setComponentName(MainActivity.class)
+				.setGraph(R.navigation.bottom_navigation)
+				.setDestination(R.id.navigation_log)
+				.createPendingIntent();
+
 		NotificationCompat.Builder notificationBuilder =
 				new NotificationCompat.Builder(this, channelId)
 						.setSmallIcon(R.drawable.ic_notifications_on_24)
 						.setContentTitle(firebaseNotification.getTitle())
 						.setContentText(firebaseNotification.getBody())
 						.setAutoCancel(true)
+						.setContentIntent(pendingIntent)
 						.setVisibility(VISIBILITY_PRIVATE)
 						.setSound(soundUri)
 						.setPriority(NotificationCompat.PRIORITY_MAX)
@@ -107,7 +117,7 @@ public class NotificationsService extends FirebaseMessagingService {
 		}
 
 		Notification notification = notificationBuilder.build();
-		notification.flags = Notification.FLAG_INSISTENT;
+		notification.flags = Notification.FLAG_INSISTENT | Notification.FLAG_AUTO_CANCEL;
 		notificationManager.notify(0, notification);
 	}
 }

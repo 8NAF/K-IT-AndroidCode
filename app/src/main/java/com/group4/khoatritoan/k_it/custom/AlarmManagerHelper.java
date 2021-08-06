@@ -10,8 +10,6 @@ import android.util.Log;
 import com.group4.khoatritoan.k_it.service.EndTimeReceiver;
 import com.group4.khoatritoan.k_it.service.StartTimeReceiver;
 
-import java.util.Calendar;
-
 public class AlarmManagerHelper {
 
 	Context context;
@@ -23,45 +21,23 @@ public class AlarmManagerHelper {
 
 	public void enforce(long startTime, long endTime) {
 
-		Calendar currentCalendar = Calendar.getInstance();
-		currentCalendar.set(Calendar.SECOND, 0);
-		currentCalendar.set(Calendar.MILLISECOND, 0);
-		long currentTime = currentCalendar.getTimeInMillis();
-
-		Log.e("AlarmManager", "enforce, before start: " + startTime);
-		Log.e("AlarmManager", "enforce, before end: " + endTime);
-		Log.e("AlarmManager", "enforce, before current: " + currentTime);
-
-
-		if (startTime <= currentTime) {
-			startTime += AlarmManager.INTERVAL_DAY;
-		}
-		if (endTime <= currentTime) {
-			endTime += AlarmManager.INTERVAL_DAY;
-		}
-		if (endTime <= startTime) {
-			endTime += AlarmManager.INTERVAL_DAY;
+		if (startTime >= endTime) {
+			Log.e("AlarmManager", "cancel because of start >= end");
+			return;
 		}
 
-		Log.e("AlarmManager", "enforce, after start: " + startTime);
-		Log.e("AlarmManager", "enforce, after end: " + endTime);
-		Log.e("AlarmManager", "enforce, after current: " + currentTime);
-
-
-		PendingIntent startPI = getPendingIntent(StartTimeReceiver.class);
-		PendingIntent endPI = getPendingIntent(EndTimeReceiver.class);
-
-		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startTime, startPI);
-		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, endTime, endPI);
+		enforce(StartTimeReceiver.class, startTime);
+		enforce(EndTimeReceiver.class, endTime);
 	}
 
-	private PendingIntent getPendingIntent(Class<? extends BroadcastReceiver> className) {
-		Intent intent = new Intent(context, className);
+	public void enforce(Class<? extends BroadcastReceiver> className, long triggerMilliseconds) {
 
-		return PendingIntent.getBroadcast(context, 1, intent,
+		Intent intent = new Intent(context, className);
+		PendingIntent pi = PendingIntent.getBroadcast(context, 1, intent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
+
+		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerMilliseconds, pi);
 	}
 
 	//#endregion
@@ -78,7 +54,8 @@ public class AlarmManagerHelper {
 		Log.e("AlarmManager", "cancel: " + className.getName());
 
 		Intent intent = new Intent(context, className);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, 0);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent,
+				PendingIntent.FLAG_CANCEL_CURRENT);
 
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarmManager.cancel(pendingIntent);
